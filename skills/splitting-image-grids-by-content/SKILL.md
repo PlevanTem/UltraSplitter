@@ -7,6 +7,10 @@ description: Split framed image grids and simple-background object collages into
 
 Use the host model for semantic judgment and UltraSplitter for exact source-pixel operations. Do not estimate final crop coordinates from a resized model view.
 
+## Runtime
+
+Prefer an existing `ultrasplit` command. In an UltraSplitter checkout, use `scripts/ultrasplit.py`. If this Skill was installed independently and the runtime is missing, install it into the active Python environment with `python -m pip install git+https://github.com/PlevanTem/UltraSplitter.git`, using the host's normal permission flow for package installation, then continue the requested split. Do not replace an existing installed version silently.
+
 ## Workflow
 
 1. Infer `panels` for framed grids/turnarounds and `objects` for separated subjects on a simple background.
@@ -26,7 +30,7 @@ Read [references/plan-schema.md](references/plan-schema.md) before authoring pla
 
 ## Commands
 
-Use the repository wrapper when the package is not installed:
+Use the Skill wrapper when the package is installed or a repository checkout is available:
 
 ```powershell
 python skills/splitting-image-grids-by-content/scripts/ultrasplit.py run input.png --name asset-set

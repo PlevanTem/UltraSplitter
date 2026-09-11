@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run UltraSplitter from a repository checkout without an editable install."""
+"""Run an installed UltraSplitter package or discover it in a repository checkout."""
 
 from __future__ import annotations
 
@@ -7,13 +7,23 @@ import sys
 from pathlib import Path
 
 
-REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
-SOURCE_ROOT = REPOSITORY_ROOT / "src"
-if not SOURCE_ROOT.is_dir():
-    raise SystemExit("UltraSplitter package not found. Run this skill inside the UltraSplitter repository.")
-sys.path.insert(0, str(SOURCE_ROOT))
+try:
+    from ultrasplitter.cli import main
+except ModuleNotFoundError as error:
+    if error.name != "ultrasplitter":
+        raise
+    for parent in Path(__file__).resolve().parents:
+        source_root = parent / "src"
+        if (source_root / "ultrasplitter").is_dir():
+            sys.path.insert(0, str(source_root))
+            break
+    else:
+        raise SystemExit(
+            "UltraSplitter runtime not found. Install it with: "
+            "python -m pip install git+https://github.com/PlevanTem/UltraSplitter.git"
+        ) from error
 
-from ultrasplitter.cli import main  # noqa: E402
+    from ultrasplitter.cli import main  # noqa: E402
 
 
 if __name__ == "__main__":

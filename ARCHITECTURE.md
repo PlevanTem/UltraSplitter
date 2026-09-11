@@ -8,20 +8,7 @@ The core package is provider-neutral. A multimodal host such as Codex or Claude 
 
 ## Processing model
 
-```text
-SCAN → MULTIMODAL TRIAGE + PLAN → APPLY → ROUTE
-          │                                  ├─ source_crop ───────────────┐
-          ├─ deliver / clean                 ├─ source_composite ──────────┤
-          ├─ repair                          └─ generated_reconstruction  │
-          └─ ignore                                     ↓                 │
-                                              awaiting_user_approval      │
-                                                        ↓                 │
-                                              PREPARE → GENERATE → INGEST │
-                                                                    ↓     │
-                                                                 EVALUATE ┘
-                                                                    ↓
-                                                       success / bounded exit
-```
+<img src="docs/assets/architecture.svg" alt="UltraSplitter agent-native processing architecture" width="100%">
 
 ### Scan
 

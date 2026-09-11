@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added a reusable README showcase renderer with automatic card grids, normalized subject scale, and consistent preview canvases.
+- Added a stylized SVG architecture overview for the bilingual READMEs.
 - Added a validated 0.65 visible-fraction repair floor plus an explicit `primary_content_recognizable` gate, preventing recognizable majority subjects from being silently ignored.
 - Added structured multimodal triage for deliver, clean, repair, and ignore decisions, including missing severity, identity evidence, and exclusion reasons.
 - Added separate delivery and triage contact sheets plus deliverable, repair, and ignored counts in CLI and manifest output.
@@ -22,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Made the Skill launcher discover either an installed package or a nearby repository checkout, so an independently installed Skill no longer assumes the repository source tree is adjacent.
 - Cleared `delivery.pending_repair_images` after successful repair ingestion.
 - Prevented unassessed edge contact from automatically authorizing generated repair; it now returns `needs_user_decision` with zero generation calls.
 - Prevented pending repair candidates and severe ignored fragments from appearing in `delivery.images` or the final delivery contact sheet.

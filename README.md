@@ -2,40 +2,83 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-UltraSplitter turns panels, turnarounds, contact sheets, and simple-background object collages into individually accessible image assets. It combines multimodal judgment with deterministic pixel operations instead of assuming that every source is an evenly spaced grid.
+**Turn AIGC sheets into individual assets your production pipeline can actually use.**
+
+Image models are good at presenting a family of ideas in one image: a UI icon set, weapon collection, character turnaround, building elevation sheet, furniture board, or product-variant grid. The sheet may look finished, but the assets inside it are still trapped in one bitmap. Uneven spacing, mixed scale, labels, touching silhouettes, and edge-clipped subjects make equal slicing unreliable.
 
 > Status: v0.1.0 provides a working deterministic splitter and a provider-neutral contract for generated repair. It does not call an image-generation API by itself.
 
-## Why
+## Why UltraSplitter
 
-Uniform slicing fails when panels have uneven widths, captions sit outside frames, subjects are scattered, or rectangular detection boxes overlap. UltraSplitter separates three decisions:
+UltraSplitter is designed for people already generating visual assets and now need clean, separate files:
 
-1. **Source crop** — preserve the original pixels when the subject is already complete.
-2. **Source composite** — isolate separable foreground pixels and place them on a clean canvas when boxes overlap but silhouettes do not.
-3. **Generated reconstruction** — prepare an auditable repair packet when pixels are missing or subjects cannot be separated. An agent must obtain user approval before generation.
+- **UI and product design** — split icon families, interface states, illustrations, badges, and component variants.
+- **Game production** — extract characters, turnarounds, weapons, props, costumes, inventory art, and concept-sheet elements.
+- **Architecture and interiors** — separate elevations, façade options, material samples, furniture concepts, and presentation-board assets.
+- **General creative production** — turn moodboards and variation sheets into named, reviewable files for downstream tools.
 
-Before routing, multimodal triage removes noise, recommends ignoring severely incomplete fragments, and prevents unassessed edge contact from becoming an automatic generation request.
+Instead of asking a vision model to guess crop coordinates, UltraSplitter lets the multimodal host judge *what each subject is* while deterministic code handles *where its source pixels are*.
 
-## Tested examples
+## What UltraSplitter provides
 
-These real inputs were run through the current workflow. Each case uses one result image: a delivery contact sheet for successful cases or a labeled triage sheet when approval is still required. All previews use the same 8:5 canvas. Click an input or result to open the full image.
+- **Content-aware splitting** — finds subjects when positions, widths, scale, and spacing are irregular; no equal-grid assumption.
+- **Source-first output** — intact assets remain original-pixel crops. Separable overlaps use foreground masks and clean re-layout rather than regeneration.
+- **Approval-gated AIGC repair** — recognizable clipped or occluded subjects are grouped into one efficient repair grid. The user sees the scope before any generation call.
+- **Bounded quality loop** — generated grids are checked for count, duplicates, background, resolution, edge contact, safe margin, and visible identity; each group stops after at most two attempts.
+- **Production-ready delivery** — named images, a compact contact sheet, provenance, status, evaluation evidence, and absolute access paths are written to `output/` and `manifest.json`.
+- **Agent-native operation** — install the Skill for Codex, Claude Code, or another compatible coding agent, or use the Python CLI directly.
 
-| Case and verified result | Input | Result |
-| --- | --- | --- |
-| **Uneven layout**<br>`success` · 4 subjects<br>4 source crops, reordered by the multimodal plan; no generated pixels. | [<img src="docs/assets/case-uneven-input-preview.png" alt="Uneven character turnaround input" width="320">](docs/assets/case-uneven-input.png) | [<img src="docs/assets/case-uneven-output-preview.png" alt="Four extracted character views" width="320">](docs/assets/case-uneven-output.png) |
-| **Dense asset sheet**<br>`success` after visual evaluation · 11 subjects<br>6 source crops + 5 source composites; one border-line false candidate was rejected by the plan. | [<img src="docs/assets/case-dense-input-preview.png" alt="Dense weapon asset sheet input" width="320">](docs/assets/case-dense-input.png) | [<img src="docs/assets/case-dense-output-preview.png" alt="Eleven extracted weapon assets" width="320">](docs/assets/case-dense-output.png) |
-| **Edge-clipped collage**<br>`success` after approved reconstruction · 5 subjects<br>2 source composites + 3 reconstructed subjects; 3 identity-poor fragments ignored. Three repair targets were batched into one grid; the first layout failed the margin check and the second passed. | [<img src="docs/assets/case-clipped-input-preview.png" alt="Edge-clipped subject collage input" width="320">](docs/assets/case-clipped-input.png) | [<img src="docs/assets/case-clipped-output-preview.png" alt="Five delivered subjects after approved reconstruction" width="320">](docs/assets/case-clipped-output.png) |
+## Showcases
 
-## Practical strengths
+Real inputs processed by the current workflow. Result previews use automatic card grids and normalize each subject by its longest dimension, so dense sheets remain readable without changing the delivered files. Click either image for the full-size version.
 
-- **Content-aware, not grid-bound** — finds subject extents when positions, widths, scales, and spacing are uneven.
-- **Useful on dense sheets** — combines source crops with foreground composites when rectangular boxes overlap but pixels remain separable.
-- **Multimodal judgment at the right layer** — the host model can reject noise, group disconnected parts, name and order outputs, and assess semantic completeness without inventing pixel coordinates.
-- **Safe handling of missing content** — a recognizable subject with at least 65% visibly retained is offered for approval-gated repair; low-evidence fragments are excluded instead of consuming generation calls.
-- **Source fidelity and traceability** — deterministic routes preserve original pixels; every output is linked to its route, source coordinates, evaluation, provenance, and absolute delivery path in `manifest.json`.
-- **Agent-native integration** — the CLI and Skill contract work with Codex, Claude Code, and other multimodal coding agents without coupling the core package to one generation provider.
+<table>
+  <thead>
+    <tr>
+      <th width="20%">Scenario</th>
+      <th width="40%">Input</th>
+      <th width="40%">Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Uneven layout</strong><br><code>success</code> · 4 subjects<br><sub>Four source crops, semantically reordered. No generated pixels.</sub></td>
+      <td align="center"><a href="docs/assets/case-uneven-input.png"><img src="docs/assets/case-uneven-input-preview.png" alt="Uneven character turnaround input" width="470"></a></td>
+      <td align="center"><a href="docs/assets/case-uneven-output.png"><img src="docs/assets/case-uneven-output-preview.png" alt="Four normalized character-view result cards" width="470"></a></td>
+    </tr>
+    <tr>
+      <td><strong>Dense asset sheet</strong><br><code>success</code> · 11 subjects<br><sub>Six source crops and five source composites; one border false positive rejected.</sub></td>
+      <td align="center"><a href="docs/assets/case-dense-input.png"><img src="docs/assets/case-dense-input-preview.png" alt="Dense weapon asset sheet input" width="470"></a></td>
+      <td align="center"><a href="docs/assets/case-dense-output.png"><img src="docs/assets/case-dense-output-preview.png" alt="Eleven compact weapon result cards" width="470"></a></td>
+    </tr>
+    <tr>
+      <td><strong>Edge-clipped collage</strong><br><code>success</code> · 5 subjects<br><sub>Two source composites and three approved reconstructions; three identity-poor fragments ignored.</sub></td>
+      <td align="center"><a href="docs/assets/case-clipped-input.png"><img src="docs/assets/case-clipped-input-preview.png" alt="Edge-clipped subject collage input" width="470"></a></td>
+      <td align="center"><a href="docs/assets/case-clipped-output.png"><img src="docs/assets/case-clipped-output-preview.png" alt="Five compact result cards after approved reconstruction" width="470"></a></td>
+    </tr>
+  </tbody>
+</table>
 
-## Install and run
+## Quickstart
+
+### 1. AI-native: add the Skill
+
+Install the single Skill directly from its repository path:
+
+```bash
+npx skills@latest add https://github.com/PlevanTem/UltraSplitter/tree/main/skills/splitting-image-grids-by-content
+```
+
+Then ask your agent in ordinary language:
+
+```text
+Use splitting-image-grids-by-content to split @generated-sheet.png.
+Deliver every usable subject and ask me before reconstructing clipped ones.
+```
+
+The Skill reuses an installed `ultrasplit` runtime or installs the Python package from this repository when the runtime is missing.
+
+### 2. Install and run the CLI
 
 ```bash
 git clone https://github.com/PlevanTem/UltraSplitter.git
@@ -44,17 +87,15 @@ python -m pip install -e .
 ultrasplit run input.png --name character-views
 ```
 
-Explicit agent planning remains available:
+<details>
+<summary>Explicit scan, plan, repair, and evaluation commands</summary>
+
+The multimodal agent can drive each state explicitly:
 
 ```bash
 ultrasplit scan input.png --output-dir work/scan
 ultrasplit apply input.png --scan work/scan/scan.json --plan work/plan.json --output-dir output/task
 ultrasplit inspect output/task/manifest.json
-```
-
-For a repair-required result:
-
-```bash
 ultrasplit repair prepare output/task/manifest.json
 # The host agent shows the request to the user and waits for approval.
 ultrasplit repair approve output/task/manifest.json --group conflict-001
@@ -63,24 +104,13 @@ ultrasplit repair ingest output/task/manifest.json --group conflict-001 --grid g
 ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 ```
 
+</details>
+
 ## Architecture
 
-```text
-image → deterministic scan → multimodal triage + plan → route
-                    ├─ ignore severe fragments         ├─ source crop
-                    ├─ request semantic decision       ├─ source composite
-                    └─ classify repairable loss        └─ repair packet → user approval
-                                                                            ↓
-                                                              external image generation
-                                                                            ↓
-                                                         ingest → split → evaluate → exit
-```
+<img src="docs/assets/architecture.svg" alt="UltraSplitter agent-native processing architecture" width="100%">
 
 Every run writes a schema-v3 manifest with exact source coordinates, route evidence, provenance, approval state, bounded repair attempts, evaluation status, and absolute delivery paths. See [ARCHITECTURE.md](ARCHITECTURE.md).
-
-## AI-native use
-
-The repository includes a Codex-compatible skill under `skills/splitting-image-grids-by-content`. The same CLI contract can be called from Claude Code or other multimodal coding agents. Model providers remain outside the core package.
 
 ## Current boundary
 

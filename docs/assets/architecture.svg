@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="720" viewBox="0 0 1440 720" role="img" aria-labelledby="title desc">
+  <title id="title">UltraSplitter agent-native architecture</title>
+  <desc id="desc">A generated asset sheet flows through deterministic scanning, multimodal planning, source-preserving routes, approval-gated reconstruction, evaluation, and delivery.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#09111f"/>
+      <stop offset="1" stop-color="#111c31"/>
+    </linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#26344c"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#02050a" flood-opacity="0.4"/>
+    </filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#7185a6"/>
+    </marker>
+    <style>
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .title { font-size: 28px; font-weight: 700; fill: #f5f8ff; letter-spacing: 1px; }
+      .eyebrow { font-size: 14px; font-weight: 700; fill: #7dd3fc; letter-spacing: 2px; }
+      .box-title { font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .box-copy { font-size: 14px; fill: #aebcd2; }
+      .route { font-size: 15px; font-weight: 700; }
+      .wire { fill: none; stroke: #7185a6; stroke-width: 2.5; marker-end: url(#arrow); }
+      .soft-wire { fill: none; stroke: #4e607e; stroke-width: 2; stroke-dasharray: 7 7; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1440" height="720" rx="28" fill="url(#bg)"/>
+  <rect width="1440" height="720" rx="28" fill="url(#dots)" opacity="0.72"/>
+
+  <text x="54" y="58" class="mono eyebrow">ULTRASPLITTER / AGENT-NATIVE PIPELINE</text>
+  <text x="54" y="94" class="mono title">generated sheet → usable, traceable assets</text>
+  <text x="1386" y="59" text-anchor="end" class="mono box-copy">schema v3 · bounded repair</text>
+
+  <!-- Main pipeline -->
+  <g filter="url(#shadow)">
+    <rect x="54" y="142" width="228" height="128" rx="18" fill="#162238" stroke="#31435f" stroke-width="2"/>
+    <text x="76" y="176" class="mono box-title">┌ INPUT</text>
+    <text x="76" y="208" class="mono box-copy">│ AIGC asset sheet</text>
+    <text x="76" y="232" class="mono box-copy">└ mixed subjects.png</text>
+
+    <rect x="340" y="142" width="228" height="128" rx="18" fill="#162238" stroke="#31435f" stroke-width="2"/>
+    <text x="362" y="176" class="mono box-title">01 / SCAN</text>
+    <text x="362" y="208" class="mono box-copy">pixels → regions</text>
+    <text x="362" y="232" class="mono box-copy">exact source coords</text>
+
+    <rect x="626" y="142" width="250" height="128" rx="18" fill="#162238" stroke="#3f5272" stroke-width="2"/>
+    <text x="648" y="176" class="mono box-title">02 / VISION PLAN</text>
+    <text x="648" y="208" class="mono box-copy">AI judges identity,</text>
+    <text x="648" y="232" class="mono box-copy">grouping + completeness</text>
+
+    <rect x="934" y="142" width="210" height="128" rx="18" fill="#162238" stroke="#3f5272" stroke-width="2"/>
+    <text x="956" y="176" class="mono box-title">03 / ROUTE</text>
+    <text x="956" y="208" class="mono box-copy">preserve first</text>
+    <text x="956" y="232" class="mono box-copy">repair only if needed</text>
+
+    <rect x="1202" y="142" width="184" height="128" rx="18" fill="#132c28" stroke="#38bfa3" stroke-width="2"/>
+    <text x="1224" y="176" class="mono box-title">✓ DELIVERY</text>
+    <text x="1224" y="208" class="mono box-copy">images/</text>
+    <text x="1224" y="232" class="mono box-copy">manifest.json</text>
+  </g>
+
+  <path d="M282 206 H340" class="wire"/>
+  <path d="M568 206 H626" class="wire"/>
+  <path d="M876 206 H934" class="wire"/>
+
+  <!-- Route branches -->
+  <path d="M1039 270 V326 H1170" class="wire"/>
+  <path d="M1039 270 V404 H1170" class="wire"/>
+  <path d="M1039 270 V482 H1098" class="wire"/>
+
+  <g filter="url(#shadow)">
+    <rect x="1170" y="300" width="216" height="58" rx="14" fill="#12352d" stroke="#36d399"/>
+    <text x="1190" y="335" class="mono route" fill="#78efc0">├─ source_crop</text>
+    <rect x="1170" y="378" width="216" height="58" rx="14" fill="#123144" stroke="#38bdf8"/>
+    <text x="1190" y="413" class="mono route" fill="#7dd3fc">├─ source_composite</text>
+    <rect x="1098" y="456" width="288" height="58" rx="14" fill="#3a2915" stroke="#f59e0b"/>
+    <text x="1118" y="491" class="mono route" fill="#fbc56d">└─ generated_reconstruction</text>
+  </g>
+
+  <path d="M1278 300 V270" class="wire"/>
+  <path d="M1278 378 V270" class="wire"/>
+
+  <!-- Repair loop -->
+  <g filter="url(#shadow)">
+    <rect x="54" y="430" width="226" height="126" rx="18" fill="#201d32" stroke="#7665c8" stroke-width="2"/>
+    <text x="76" y="464" class="mono box-title">A / TRIAGE</text>
+    <text x="76" y="496" class="mono box-copy">deliver · repair</text>
+    <text x="76" y="520" class="mono box-copy">ignore · ask user</text>
+
+    <rect x="338" y="430" width="226" height="126" rx="18" fill="#322515" stroke="#d89838" stroke-width="2"/>
+    <text x="360" y="464" class="mono box-title">B / APPROVAL</text>
+    <text x="360" y="496" class="mono box-copy">show targets + cost</text>
+    <text x="360" y="520" class="mono box-copy">user authorizes once</text>
+
+    <rect x="622" y="430" width="226" height="126" rx="18" fill="#2d1d2f" stroke="#c55ac7" stroke-width="2"/>
+    <text x="644" y="464" class="mono box-title">C / AIGC GRID</text>
+    <text x="644" y="496" class="mono box-copy">one group · one grid</text>
+    <text x="644" y="520" class="mono box-copy">complete + normalize</text>
+
+    <rect x="906" y="570" width="238" height="94" rx="18" fill="#162238" stroke="#536a8e" stroke-width="2"/>
+    <text x="928" y="604" class="mono box-title">D / INGEST + SPLIT</text>
+    <text x="928" y="636" class="mono box-copy">validate grid → assets</text>
+
+    <rect x="622" y="570" width="226" height="94" rx="18" fill="#162238" stroke="#536a8e" stroke-width="2"/>
+    <text x="644" y="604" class="mono box-title">E / EVALUATE</text>
+    <text x="644" y="636" class="mono box-copy">pass / retry ≤ 2 / exit</text>
+  </g>
+
+  <path d="M626 270 V340 H167 V430" class="soft-wire"/>
+  <path d="M280 493 H338" class="wire"/>
+  <path d="M564 493 H622" class="wire"/>
+  <path d="M848 493 H1025 V570" class="wire"/>
+  <path d="M906 617 H848" class="wire"/>
+  <path d="M622 648 H590 V493 H622" class="soft-wire"/>
+  <text x="338" y="618" class="mono box-copy" fill="#fbc56d">retry only the failed constraint</text>
+  <path d="M1144 617 H1294 V270" class="wire"/>
+
+  <text x="54" y="687" class="mono box-copy">source pixels stay source pixels  ·  generated pixels stay labeled  ·  every run ends with an explicit state</text>
+</svg>
