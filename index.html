@@ -123,11 +123,19 @@
     .hero { padding: 76px 0 40px; }
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(330px, 0.72fr) minmax(520px, 1.28fr);
-      gap: clamp(38px, 5vw, 72px);
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(44px, 5vw, 64px);
+      align-items: stretch;
     }
     .hero-grid > *, .process-grid > *, .quickstart-wrap > * { min-width: 0; }
+    .hero-copy {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+      gap: clamp(36px, 6vw, 84px);
+      align-items: end;
+    }
+    .hero-title-block, .hero-action-block { min-width: 0; }
+    .hero-action-block { padding-bottom: 7px; }
     .eyebrow {
       margin: 0 0 22px;
       font: 700 0.75rem/1.4 var(--mono);
@@ -137,10 +145,10 @@
     }
     h1, h2, h3, p { margin-top: 0; }
     h1 {
-      max-width: 760px;
-      margin-bottom: 30px;
+      max-width: 820px;
+      margin-bottom: 0;
       font-family: var(--display);
-      font-size: clamp(3.35rem, 5.6vw, 6.1rem);
+      font-size: clamp(3.9rem, 5.45vw, 5.5rem);
       line-height: 0.93;
       letter-spacing: -0.067em;
       font-weight: 800;
@@ -175,6 +183,8 @@
     .button.secondary:hover { background: var(--white); }
     .hero-demo {
       position: relative;
+      width: calc(100% - 24px);
+      max-width: calc(100% - 24px);
       min-width: 0;
       padding: 12px;
       background: var(--ink);
@@ -192,8 +202,8 @@
     }
     .hero-stage {
       position: relative;
-      aspect-ratio: 1.42 / 1;
-      min-height: 450px;
+      aspect-ratio: 16 / 8.75;
+      min-height: 0;
       overflow: hidden;
       background: #e9eef5;
       isolation: isolate;
@@ -464,6 +474,9 @@
       .nav-links { display: none; }
       .hero { padding-top: 54px; }
       .hero-grid, .process-grid, .quickstart-wrap { grid-template-columns: minmax(0, 1fr); }
+      .hero-copy { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+      .hero-action-block { padding-bottom: 0; }
+      h1 { max-width: 760px; }
       .hero-grid { gap: 54px; }
       .hero-demo { width: calc(100% - 18px); max-width: calc(100% - 18px); box-shadow: 18px 18px 0 var(--orange); }
       .hero-stage { min-height: 0; }
@@ -485,6 +498,9 @@
       .header-inner { min-height: 62px; }
       .brand { font-size: 0.82rem; }
       h1 { font-size: clamp(3.1rem, 15vw, 4.8rem); }
+      .hero-copy { gap: 26px; }
+      .hero-lede { margin-bottom: 28px; }
+      .hero-stage { aspect-ratio: 1.18 / 1; }
       section { padding: 78px 0; }
       .section-head { grid-template-columns: 1fr; gap: 14px; margin-bottom: 44px; }
       .status-strip { grid-template-columns: 1fr; gap: 0; }
@@ -541,19 +557,23 @@
   <main id="top">
     <div class="shell hero">
       <div class="hero-grid">
-        <div>
-          <p class="eyebrow">Design report / Release 0.1.0</p>
-          <h1>
-            <span class="lang-zh">把整张创意图，拆成真正可用的独立资产。</span>
-            <span class="lang-en">Turn one creative sheet into usable individual assets.</span>
-          </h1>
-          <p class="hero-lede">
-            <span class="lang-zh">UltraSplitter 为不规则 AIGC 合图提供按内容拆分：多模态 Agent 判断主体，确定性代码处理像素、坐标、掩码和交付。原图像素优先；需要补全时，先明确范围，再由用户批准。</span>
-            <span class="lang-en">UltraSplitter splits irregular AIGC sheets by content. A multimodal agent identifies each subject; deterministic code owns pixels, coordinates, masks and delivery. Source pixels come first, and any reconstruction requires explicit approval.</span>
-          </p>
-          <div class="cta-row">
-            <a class="button" href="#quickstart"><span class="lang-zh">安装并开始</span><span class="lang-en">Install and start</span> ↓</a>
-            <a class="button secondary" href="#showcases"><span class="lang-zh">查看真实案例</span><span class="lang-en">View real cases</span></a>
+        <div class="hero-copy">
+          <div class="hero-title-block">
+            <p class="eyebrow">Design report / Release 0.1.0</p>
+            <h1>
+              <span class="lang-zh">把整张创意图，拆成真正可用的独立资产。</span>
+              <span class="lang-en">Turn one creative sheet into usable individual assets.</span>
+            </h1>
+          </div>
+          <div class="hero-action-block">
+            <p class="hero-lede">
+              <span class="lang-zh">UltraSplitter 为不规则 AIGC 合图提供按内容拆分：多模态 Agent 判断主体，确定性代码处理像素、坐标、掩码和交付。原图像素优先；需要补全时，先明确范围，再由用户批准。</span>
+              <span class="lang-en">UltraSplitter splits irregular AIGC sheets by content. A multimodal agent identifies each subject; deterministic code owns pixels, coordinates, masks and delivery. Source pixels come first, and any reconstruction requires explicit approval.</span>
+            </p>
+            <div class="cta-row">
+              <a class="button" href="#quickstart"><span class="lang-zh">安装并开始</span><span class="lang-en">Install and start</span> ↓</a>
+              <a class="button secondary" href="#showcases"><span class="lang-zh">查看真实案例</span><span class="lang-en">View real cases</span></a>
+            </div>
           </div>
         </div>
         <figure class="hero-demo is-animating" aria-labelledby="hero-case-title" aria-describedby="hero-case-note">
