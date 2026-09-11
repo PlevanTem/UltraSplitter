@@ -12,11 +12,19 @@ Uniform slicing fails when panels have uneven widths, captions sit outside frame
 2. **Source composite** — isolate separable foreground pixels and place them on a clean canvas when boxes overlap but silhouettes do not.
 3. **Generated reconstruction** — prepare an auditable repair packet when pixels are missing or subjects cannot be separated. An agent must obtain user approval before generation.
 
-## Example
+## Real-world example
 
-| Uneven framed source | Content-aware outputs |
+This real four-character reference was processed by UltraSplitter. The run completed with `success`: four panels were detected and all four outputs used `source_crop`, preserving the source pixels without generated reconstruction.
+
+| Real test input | Actual split output contact sheet |
 | --- | --- |
-| ![Synthetic uneven four-panel source](tests/fixtures/generated/p0-irregular-panels.png) | ![Four clean source-faithful outputs](docs/assets/demo-contact-sheet.png) |
+| <img src="docs/assets/real-gothic-input.png" alt="Real four-character panel input" width="560"> | <img src="docs/assets/real-gothic-output-grid.png" alt="Contact sheet of four actual split outputs" width="560"> |
+
+| Output 01 | Output 02 | Output 03 | Output 04 |
+| --- | --- | --- | --- |
+| [<img src="docs/assets/real-gothic-output-01.png" alt="Split output 01" width="220">](docs/assets/real-gothic-output-01.png) | [<img src="docs/assets/real-gothic-output-02.png" alt="Split output 02" width="220">](docs/assets/real-gothic-output-02.png) | [<img src="docs/assets/real-gothic-output-03.png" alt="Split output 03" width="220">](docs/assets/real-gothic-output-03.png) | [<img src="docs/assets/real-gothic-output-04.png" alt="Split output 04" width="220">](docs/assets/real-gothic-output-04.png) |
+
+Click an individual output to open its full-resolution image.
 
 ## Install and run
 
