@@ -1,5 +1,7 @@
 # UltraSplitter
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 UltraSplitter turns panels, turnarounds, contact sheets, and simple-background object collages into individually accessible image assets. It combines multimodal judgment with deterministic pixel operations instead of assuming that every source is an evenly spaced grid.
 
 > Status: v0.1.0 provides a working deterministic splitter and a provider-neutral contract for generated repair. It does not call an image-generation API by itself.
