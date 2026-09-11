@@ -14,19 +14,24 @@ UltraSplitter 将分栏图、角色多视图、联系表和简单背景的主体
 2. **原像素重排（Source composite）**——检测框重叠但前景轮廓可分离时，提取原始前景并放置到干净画布。
 3. **生成式重建（Generated reconstruction）**——像素缺失或主体无法分离时，生成可审计的修复包；执行生成前必须由 Agent 获得用户批准。
 
-## 真实测试案例
+## 实测案例
 
-下面的四人物参考图由 UltraSplitter 实际处理。运行终态为 `success`：检测到 4 个分栏，4 张输出均采用 `source_crop`，保留原图像素，未使用生成式重建。
+以下结果均由当前工作流实际运行产生。每个案例只展示一张输出联系表，所有预览统一使用 8:5 画布；点击输入或输出可打开完整图片。
 
-| 真实测试输入 | 实际拆分结果联系表 |
-| --- | --- |
-| <img src="docs/assets/real-gothic-input.png" alt="真实四人物分栏输入图" width="560"> | <img src="docs/assets/real-gothic-output-grid.png" alt="四张实际拆分结果的联系表" width="560"> |
+| 案例与实测结果 | 输入 | 输出 |
+| --- | --- | --- |
+| **分布不均**<br>`success` · 4 个主体<br>4 个原图裁切，由多模态规划调整输出顺序；未生成任何像素。 | [<img src="docs/assets/case-uneven-input-preview.png" alt="分布不均的角色多视图输入" width="320">](docs/assets/case-uneven-input.png) | [<img src="docs/assets/case-uneven-output-preview.png" alt="4 张角色视图拆分结果" width="320">](docs/assets/case-uneven-output.png) |
+| **数量多、排布杂**<br>视觉复核后 `success` · 11 个主体<br>6 个原图裁切 + 5 个原像素重排；规划阶段排除了 1 条边界线伪候选。 | [<img src="docs/assets/case-dense-input-preview.png" alt="高密度武器素材输入" width="320">](docs/assets/case-dense-input.png) | [<img src="docs/assets/case-dense-output-preview.png" alt="11 件武器拆分结果" width="320">](docs/assets/case-dense-output.png) |
+| **边缘截断**<br>`awaiting_user_approval` · 8 个候选<br>识别到 6 个边缘截断候选并归入 2 个修复请求；未执行图片生成。 | [<img src="docs/assets/case-clipped-input-preview.png" alt="主体被画面边缘截断的输入" width="320">](docs/assets/case-clipped-input.png) | [<img src="docs/assets/case-clipped-output-preview.png" alt="等待修复批准的暂存拆分联系表" width="320">](docs/assets/case-clipped-output.png) |
 
-| 输出 01 | 输出 02 | 输出 03 | 输出 04 |
-| --- | --- | --- | --- |
-| [<img src="docs/assets/real-gothic-output-01.png" alt="拆分结果 01" width="220">](docs/assets/real-gothic-output-01.png) | [<img src="docs/assets/real-gothic-output-02.png" alt="拆分结果 02" width="220">](docs/assets/real-gothic-output-02.png) | [<img src="docs/assets/real-gothic-output-03.png" alt="拆分结果 03" width="220">](docs/assets/real-gothic-output-03.png) | [<img src="docs/assets/real-gothic-output-04.png" alt="拆分结果 04" width="220">](docs/assets/real-gothic-output-04.png) |
+## 能力优势
 
-点击任意输出图可查看原始分辨率版本。
+- **不依赖均匀宫格**——主体的位置、宽度、大小和间距不一致时，仍按内容边界定位。
+- **适用于高密度素材图**——矩形框互相重叠但前景像素可分时，组合使用原图裁切与原像素重排。
+- **让多模态模型只做关键判断**——宿主模型负责排除噪声、组合断开部件、命名排序和判断语义完整性，不让模型凭空填写像素坐标。
+- **缺失内容不会静默放行**——遇到截断、遮挡或不可分离主体时，停在明确的用户批准关口，不把残缺素材当成成功结果交付。
+- **保真且可追溯**——确定性路径保留原始像素；`manifest.json` 记录每张图的路由、源图坐标、评估、来源和绝对访问路径。
+- **面向 Agent 集成**——CLI 与 Skill 契约可被 Codex、Claude Code 和其他多模态编码 Agent 调用，核心包不绑定单一图片生成供应商。
 
 ## 安装与运行
 
