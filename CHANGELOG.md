@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added a reproducible ASCII-style README motion banner, static alternative, and compact shortcut badges.
+- Added a product roadmap and evaluation protocol focused on a packaged GUI, three user-facing measures, and a planned competitor baseline.
+- Added owner-provided WeChat consulting details and direct Afdian / Buy Me a Coffee sponsorship links to both READMEs, without QR codes and with consulting separate from sponsorship.
 - Added a reusable README showcase renderer with automatic card grids, normalized subject scale, and consistent preview canvases.
 - Added a stylized SVG architecture overview for the bilingual READMEs.
 - Added a validated 0.65 visible-fraction repair floor plus an explicit `primary_content_recognizable` gate, preventing recognizable majority subjects from being silently ignored.

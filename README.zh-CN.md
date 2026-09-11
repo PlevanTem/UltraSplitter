@@ -2,6 +2,12 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
+<img src="docs/assets/banner.gif" alt="ASCII 流程示意：整图输入、内容定位与审核、独立资产输出" width="100%">
+
+[![快速开始](docs/assets/nav-quickstart.svg)](#quickstart) [![案例展示](docs/assets/nav-showcases.svg)](#showcases) [![版本发布](docs/assets/nav-releases.svg)](https://github.com/PlevanTem/UltraSplitter/releases) [![问题反馈](docs/assets/nav-issues.svg)](https://github.com/PlevanTem/UltraSplitter/issues) [![定制咨询与赞助](docs/assets/nav-support.svg)](#support)
+
+<sub>流程示意动画 · <a href="docs/assets/banner-static.png">查看静态版</a></sub>
+
 **把 AIGC 生成的整张方案图，变成生产流程真正能用的独立资产。**
 
 图片模型很擅长在一张图里展示一组创意：UI 图标、武器合集、角色多视图、建筑立面、家具方案、产品变体。整图看起来已经完成，但里面的素材仍被锁在一个位图文件中。间距不均、尺寸混杂、文字边框、轮廓相接和主体截断，都会让均匀切图失效。
@@ -121,10 +127,22 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 
 ## 路线图
 
-- 在更大规模、授权清晰的基准集上校准前景冲突阈值。
-- 增加供应商适配器，同时保持核心包不接触用户凭据。
-- 增加独立的多模态身份一致性评分，并改进透明边缘处理。
-- 仅在完成可复现评估后发布性能数据。
+- [ ] **下载即用的图形化工具。** 优先打包 Windows 桌面应用：拖入图片、预览结果、确认补全、打开导出目录。本地拆图无需配置 Python 或 Node；需要模型支持的补全另行明确要求。
+- [ ] **用真实任务持续改进。** 补充 UI、游戏、建筑案例，只跟踪三个核心指标：**交付达标率、端到端完成耗时、人工干预次数**。
+- [ ] **建立可复核的竞品基线。** 与均匀裁剪、LibTV 宫格拆分、Lovart 图片分层比较共同任务；原像素提取与生成重建分开统计，不支持项如实列出。目前尚未完成竞品实测。
+
+详见[评测方案与里程碑](docs/ROADMAP.md)。以上为计划，不代表当前版本已经具备这些能力。
+
+<a id="support"></a>
+
+## 定制咨询与支持
+
+需要适配自己的 UI 资产、游戏素材库或建筑方案流程？定制咨询将围绕工作流设计、工具集成和交付要求展开。自愿赞助用于支持维护与测试，与付费定制服务分开。
+
+- **定制咨询 · 微信：** `lelouchdbf` — 在微信搜索此账号，添加时请备注 UltraSplitter、使用场景与预期交付。
+- **支持项目维护：** [♡ 爱发电](https://afdian.com/a/bufan666) · [☕ Buy Me a Coffee](https://buymeacoffee.com/bufan666)
+
+赞助完全自愿，不包含定制服务或优先交付承诺；定制需求请另行沟通范围与报价。
 
 ## 许可证
 

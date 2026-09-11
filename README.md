@@ -2,6 +2,12 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
+<img src="docs/assets/banner.gif" alt="ASCII workflow illustration: one sheet, content-aware review, individual assets" width="100%">
+
+[![Quickstart](docs/assets/nav-quickstart.svg)](#quickstart) [![Showcases](docs/assets/nav-showcases.svg)](#showcases) [![Releases](docs/assets/nav-releases.svg)](https://github.com/PlevanTem/UltraSplitter/releases) [![Feedback](docs/assets/nav-issues.svg)](https://github.com/PlevanTem/UltraSplitter/issues) [![Consult / Sponsor](docs/assets/nav-support.svg)](#support)
+
+<sub>Workflow illustration · <a href="docs/assets/banner-static.png">Static view</a></sub>
+
 **Turn AIGC sheets into individual assets your production pipeline can actually use.**
 
 Image models are good at presenting a family of ideas in one image: a UI icon set, weapon collection, character turnaround, building elevation sheet, furniture board, or product-variant grid. The sheet may look finished, but the assets inside it are still trapped in one bitmap. Uneven spacing, mixed scale, labels, touching silhouettes, and edge-clipped subjects make equal slicing unreliable.
@@ -121,10 +127,22 @@ Every run writes a schema-v3 manifest with exact source coordinates, route evide
 
 ## Roadmap
 
-- Calibrate foreground-conflict thresholds on a larger licensed benchmark.
-- Add provider adapters without coupling credentials to the core package.
-- Add independent multimodal identity scoring and richer transparent-edge handling.
-- Publish benchmark reports only after reproducible evaluation exists.
+- [ ] **Download, open, split.** Package a desktop GUI, starting with Windows: drag in images, preview results, approve repairs, and open exported assets. No Python or Node setup for local splitting; model-backed repair requirements stay explicit.
+- [ ] **Improve against real tasks.** Expand UI, game, and architecture cases. Track just three headline measures: **task delivery pass rate, end-to-end completion time, and human intervention count**.
+- [ ] **Establish an honest baseline.** Compare with uniform slicing, LibTV grid splitting, and Lovart image layering on shared tasks. Report extraction and generated reconstruction separately, including unsupported cases. Competitor testing is planned, not yet completed.
+
+See the [evaluation protocol and milestones (中文)](docs/ROADMAP.md). These are planned capabilities, not claims about the current release.
+
+<a id="support"></a>
+
+## Custom workflows & support
+
+Need a workflow adapted to your UI assets, game library, or architecture boards? Custom consulting will cover workflow design, integration, and delivery requirements. Optional sponsorship supports maintenance and test coverage; it is separate from paid consulting.
+
+- **Custom consulting · WeChat:** `lelouchdbf` — search this ID in WeChat and mention UltraSplitter, your use case, and expected deliverables.
+- **Sponsor development:** [☕ Buy Me a Coffee](https://buymeacoffee.com/bufan666) · [♡ 爱发电 / Afdian](https://afdian.com/a/bufan666)
+
+Sponsorship is optional and does not include custom services or priority delivery. Discuss scope and pricing separately before commissioning work.
 
 ## License
 

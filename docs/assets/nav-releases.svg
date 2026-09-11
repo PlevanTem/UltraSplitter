@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="110" height="28" role="img" aria-label="Releases">
+<rect x=".5" y=".5" width="109" height="27" rx="5" fill="#f6f7f9" stroke="#dce1e6"/>
+<text x="11" y="18" font-family="monospace" font-size="12" fill="#247c72">v</text>
+<text x="36" y="18" font-family="Arial,sans-serif" font-size="12" fill="#202630">Releases</text>
+</svg>
