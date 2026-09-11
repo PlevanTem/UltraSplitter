@@ -1,0 +1,7 @@
+interface:
+  display_name: "UltraSplitter"
+  short_description: "Split image layouts with approval-gated repair"
+  default_prompt: "Use $splitting-image-grids-by-content to split this image into accessible subject assets and verify every result."
+
+policy:
+  allow_implicit_invocation: true
