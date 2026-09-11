@@ -11,7 +11,7 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 
 Before approval, show the user one concise decision summary: deliverable count, repair candidate count, recommended ignored count, clean source montage, original `context.png`, target map, target order, reasons, number of groups/calls, and maximum of two attempts per group.
 
-Do not prepare repair while the manifest is `needs_user_decision`; first classify every clipped or ambiguous target. Severe fragments and candidates without enough identity evidence belong in structured exclusions and do not consume generation calls.
+Do not prepare repair while the manifest is `needs_user_decision`; first classify every clipped or ambiguous target. A candidate is repair-eligible only when at least 0.65 is visibly retained, its primary content is recognizable, and identity confidence is above `low`. The threshold is a floor rather than an automatic decision. Severe fragments and candidates without enough identity evidence belong in structured exclusions and do not consume generation calls.
 
 For each group, pass its clean `source.png`, original `context.png`, and `target-map.png` to the available image-generation tool with the exact generated `prompt.txt`. Produce all group subjects in one evenly spaced grid. Do not generate one subject at a time unless the prepared group contains only one subject.
 

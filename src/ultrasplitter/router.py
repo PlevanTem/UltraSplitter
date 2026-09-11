@@ -6,7 +6,13 @@ import math
 from pathlib import Path
 from typing import Any
 
-from .contracts import MAX_SUBJECTS_PER_REPAIR_GRID, load_json, require_v3, write_json
+from .contracts import (
+    MAX_SUBJECTS_PER_REPAIR_GRID,
+    MIN_REPAIR_VISIBLE_FRACTION,
+    load_json,
+    require_v3,
+    write_json,
+)
 from .core import load_image, make_contact_sheet
 from .extractor import compose_source_item
 
@@ -63,11 +69,17 @@ def _repair_eligibility(plan_item: dict[str, Any], source_clipped: bool) -> tupl
     action = assessment.get("recommended_action")
     severity = assessment.get("missing_severity")
     confidence = assessment.get("identity_confidence", assessment.get("confidence"))
+    visible = assessment.get("visible_fraction_estimate")
+    recognizable = assessment.get("primary_content_recognizable")
     visibly_complete = assessment.get("complete") is True
 
     if action in {"deliver", "clean"} and visibly_complete and confidence == "high":
         return "not_required", []
     if action == "repair" or severity in {"minor", "repairable"}:
+        if visible is None or visible < MIN_REPAIR_VISIBLE_FRACTION:
+            return "needs_semantic_triage", ["below_repair_visibility_threshold"]
+        if recognizable is not True or confidence == "low":
+            return "needs_semantic_triage", ["insufficient_identity_evidence"]
         if source_clipped:
             reasons.append("source_clipped")
         return "eligible", sorted(set(reasons or ["visually_incomplete"]))

@@ -10,6 +10,7 @@ __version__ = "0.1.0"
 SCHEMA_VERSION = 3
 MAX_REPAIR_ATTEMPTS = 2
 MAX_SUBJECTS_PER_REPAIR_GRID = 6
+MIN_REPAIR_VISIBLE_FRACTION = 0.65
 
 ORIGINS = {"source_crop", "source_composite", "generated_reconstruction"}
 TERMINAL_STATUSES = {

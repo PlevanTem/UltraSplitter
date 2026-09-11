@@ -27,6 +27,8 @@ from typing import Any, Iterable
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
+from .contracts import MIN_REPAIR_VISIBLE_FRACTION
+
 
 SCHEMA_VERSION = 3
 SUPPORTED_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
@@ -723,6 +725,19 @@ def apply_plan(
         visible = exclusion.get("visible_fraction_estimate")
         if visible is not None and (not isinstance(visible, (int, float)) or not 0 <= visible <= 1):
             raise SplitError(f"exclusion {index} visible_fraction_estimate must be between 0 and 1")
+        recognizable = exclusion.get("primary_content_recognizable")
+        if recognizable not in {None, True, False}:
+            raise SplitError(f"exclusion {index} primary_content_recognizable must be a boolean")
+        if (
+            visible is not None
+            and visible >= MIN_REPAIR_VISIBLE_FRACTION
+            and recognizable is True
+            and not exclusion.get("user_declined_repair", False)
+        ):
+            raise SplitError(
+                f"exclusion {index} retains at least {MIN_REPAIR_VISIBLE_FRACTION:.2f} of a recognizable "
+                "subject and must be offered for repair; set user_declined_repair only after explicit rejection"
+            )
 
     background_uniformity = float(candidate.get("evidence", {}).get("background_uniformity", 1.0))
     should_emit_alpha = emit in {"rgba", "all"} or (
@@ -766,6 +781,22 @@ def apply_plan(
             visible = assessment.get("visible_fraction_estimate")
             if visible is not None and (not isinstance(visible, (int, float)) or not 0 <= visible <= 1):
                 raise SplitError(f"item {index} visible_fraction_estimate must be between 0 and 1")
+            recognizable = assessment.get("primary_content_recognizable")
+            if recognizable not in {None, True, False}:
+                raise SplitError(f"item {index} primary_content_recognizable must be a boolean")
+            repair_intent = action == "repair" or severity in {"minor", "repairable"}
+            if repair_intent:
+                if visible is None:
+                    raise SplitError(f"item {index} repair requires visible_fraction_estimate")
+                if visible < MIN_REPAIR_VISIBLE_FRACTION:
+                    raise SplitError(
+                        f"item {index} repair requires visible_fraction_estimate >= "
+                        f"{MIN_REPAIR_VISIBLE_FRACTION:.2f}"
+                    )
+                if recognizable is not True:
+                    raise SplitError(f"item {index} repair requires primary_content_recognizable=true")
+                if assessment.get("identity_confidence", assessment.get("confidence")) == "low":
+                    raise SplitError(f"item {index} repair requires identity confidence above low")
 
     overlap_with_outputs = sorted(set(excluded_regions) & used_regions)
     if overlap_with_outputs:

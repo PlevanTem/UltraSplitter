@@ -18,6 +18,7 @@ Plans select exact scan candidate IDs and may attach visible semantic evidence:
       "regions": ["cc-009"],
       "missing_severity": "severe",
       "visible_fraction_estimate": 0.1,
+      "primary_content_recognizable": false,
       "critical_parts_missing": ["identity"],
       "identity_confidence": "low",
       "recommended_action": "ignore",
@@ -36,6 +37,7 @@ Plans select exact scan candidate IDs and may attach visible semantic evidence:
         "semantic_subject_count": 1,
         "missing_severity": "none",
         "visible_fraction_estimate": 1.0,
+        "primary_content_recognizable": true,
         "critical_parts_missing": [],
         "identity_confidence": "high",
         "recommended_action": "deliver"
@@ -51,7 +53,8 @@ Plans select exact scan candidate IDs and may attach visible semantic evidence:
 - `padding` defaults to `0` for panels and `0.03` for objects.
 - `emit` is `auto`, `crop`, `rgba`, or `all`.
 - `visual_assessment` is required for clipped, contaminated, touching, or ambiguous candidates. `recommended_action` is `deliver`, `clean`, or `repair`; `missing_severity` is `none`, `minor`, or `repairable` for retained items.
-- `visible_fraction_estimate` is advisory. Do not use area alone: missing identity-defining structure can make an otherwise large fragment unsuitable for reconstruction.
+- A repair item requires `visible_fraction_estimate >= 0.65`, `primary_content_recognizable: true`, and identity confidence above `low`. The fraction is a gate, not an automatic semantic decision: missing identity-defining structure can still make a large fragment unsuitable for reconstruction.
+- A recognizable candidate at or above 0.65 must be offered for repair rather than silently ignored. It may be excluded only after explicit rejection, recorded as `user_declined_repair: true`.
 - Severely incomplete or identity-ambiguous candidates must not appear in `items`. Put their region IDs in `exclude_regions` and describe them in `exclusions` with `recommended_action: ignore` and `missing_severity: severe`.
 - Use `allow_shared_regions_for_repair: true` only when multiple semantic subjects genuinely occupy the same connected component. Every item sharing that region must be marked for generated repair.
 - Regions may otherwise appear in only one item. Explicit noise, captions, or dividers belong in `exclude_regions`.

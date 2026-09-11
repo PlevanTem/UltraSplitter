@@ -255,6 +255,11 @@ def ingest_repair(manifest_path: Path, group_id: str, grid_path: Path) -> dict[s
     manifest["delivery"]["alpha_images"] = [
         item["rgba_path"] for item in deliverable_items if item.get("rgba_path")
     ]
+    manifest["delivery"]["pending_repair_images"] = [
+        item.get("review_image_path", item["image_path"])
+        for item in manifest["items"]
+        if item.get("route") == "generated_reconstruction" and not item.get("deliverable")
+    ]
     manifest["deliverable_count"] = len(deliverable_items)
     make_contact_sheet(deliverable_items, Path(manifest["delivery"]["contact_sheet"]))
     write_json(manifest_path, manifest)

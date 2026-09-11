@@ -132,6 +132,11 @@ def evaluate_manifest(manifest_path: Path, visual_verdict: str | None = None) ->
         and next(group for group in groups if group["id"] == group_id).get("state") != "ingested"
         and not attempt.get("evaluation", {}).get("passed", False)
     ]
+    manifest.setdefault("delivery", {})["pending_repair_images"] = [
+        item.get("review_image_path", item["image_path"])
+        for item in manifest.get("items", [])
+        if item.get("route") == "generated_reconstruction" and not item.get("deliverable")
+    ]
     manifest.setdefault("evaluation", {})["visual"] = visual_verdict or manifest["evaluation"].get(
         "visual", "not_run"
     )

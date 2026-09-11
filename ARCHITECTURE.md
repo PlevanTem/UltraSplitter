@@ -29,9 +29,9 @@ Panel candidates come from continuous divider/frame evidence. Object candidates 
 
 ### Plan
 
-The host chooses a candidate set and groups stable region IDs into semantic items. Every clipped, contaminated, touching, or ambiguous candidate requires a `visual_assessment`. The host classifies it as `deliver`, `clean`, `repair`, or `ignore` and records visible completeness, missing critical parts, identity confidence, and an advisory visible-fraction estimate.
+The host chooses a candidate set and groups stable region IDs into semantic items. Every clipped, contaminated, touching, or ambiguous candidate requires a `visual_assessment`. The host classifies it as `deliver`, `clean`, `repair`, or `ignore` and records visible completeness, whether the primary content remains recognizable, missing critical parts, identity confidence, and a visible-fraction estimate.
 
-Severely incomplete or identity-ambiguous fragments belong in `exclude_regions` plus structured `exclusions`; they are not output items and never become repair requests. Visible area alone is insufficient: missing identity-defining structure outweighs a large remaining pixel area.
+Generated repair requires all three gates: at least `0.65` of the subject is visibly retained, the primary content remains recognizable, and identity confidence is above `low`. A recognizable majority cannot be silently ignored; it is offered for approval-gated repair. Explicit user rejection may be recorded with `user_declined_repair: true`. Severely incomplete or identity-ambiguous fragments belong in `exclude_regions` plus structured `exclusions`; they are not output items and never become repair requests. Visible area alone is insufficient: missing identity-defining structure outweighs a large remaining pixel area.
 
 ### Route
 

@@ -36,6 +36,7 @@ def apply_repair_eligible(source: Path, root: Path) -> tuple[dict, Path]:
                     "complete": False,
                     "missing_severity": "repairable",
                     "visible_fraction_estimate": 0.75,
+                    "primary_content_recognizable": True,
                     "critical_parts_missing": [],
                     "identity_confidence": "high",
                     "recommended_action": "repair",
@@ -125,6 +126,7 @@ class RouteAndRepairTests(unittest.TestCase):
                         "regions": [fragment["id"]],
                         "missing_severity": "severe",
                         "visible_fraction_estimate": 0.15,
+                        "primary_content_recognizable": False,
                         "critical_parts_missing": ["identity"],
                         "recommended_action": "ignore",
                         "reason": ["insufficient_identity_evidence"],
@@ -158,6 +160,7 @@ class RouteAndRepairTests(unittest.TestCase):
                 "complete": False,
                 "missing_severity": "repairable",
                 "visible_fraction_estimate": 0.8,
+                "primary_content_recognizable": True,
                 "identity_confidence": "high",
                 "recommended_action": "repair",
             }
@@ -194,6 +197,82 @@ class RouteAndRepairTests(unittest.TestCase):
                     if red > 180 and 60 < green < 190 and blue < 80
                 )
             self.assertEqual(orange_pixels, 0)
+
+    def test_repair_requires_visible_recognizable_majority(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "clipped.png"
+            image = Image.new("RGB", (220, 160), "white")
+            ImageDraw.Draw(image).rectangle((0, 30, 80, 130), fill="purple")
+            image.save(source)
+            scan = core.scan_image(source, root / "scan", "objects", None, 32, 0.0005, 1000, False)
+            region = scan["scan"]["candidate_sets"][0]["regions"][0]["id"]
+            base_assessment = {
+                "complete": False,
+                "missing_severity": "repairable",
+                "identity_confidence": "high",
+                "recommended_action": "repair",
+            }
+            for visible, recognizable, message in (
+                (0.64, True, "visible_fraction_estimate >= 0.65"),
+                (0.65, False, "primary_content_recognizable=true"),
+            ):
+                plan = {
+                    "schema_version": 3,
+                    "mode": "objects",
+                    "candidate_set": scan["scan"]["candidate_sets"][0]["id"],
+                    "expected_count": 1,
+                    "items": [
+                        {
+                            "id": "item-001",
+                            "label": "candidate",
+                            "regions": [region],
+                            "visual_assessment": {
+                                **base_assessment,
+                                "visible_fraction_estimate": visible,
+                                "primary_content_recognizable": recognizable,
+                            },
+                        }
+                    ],
+                }
+                with self.assertRaisesRegex(core.SplitError, message):
+                    core.apply_plan(source, scan["scan_path"], plan, root / f"result-{visible}-{recognizable}", False)
+
+    def test_recognizable_majority_cannot_be_silently_ignored(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "clipped.png"
+            image = Image.new("RGB", (220, 160), "white")
+            draw = ImageDraw.Draw(image)
+            draw.rectangle((0, 30, 65, 130), fill="purple")
+            draw.ellipse((125, 45, 195, 120), fill="green")
+            image.save(source)
+            scan = core.scan_image(source, root / "scan", "objects", None, 32, 0.0005, 1000, False)
+            regions = scan["scan"]["candidate_sets"][0]["regions"]
+            region = next(item for item in regions if "source_clipped" in item["flags"])["id"]
+            complete = next(item for item in regions if "source_clipped" not in item["flags"])["id"]
+            plan = {
+                "schema_version": 3,
+                "mode": "objects",
+                "candidate_set": scan["scan"]["candidate_sets"][0]["id"],
+                "expected_count": 1,
+                "exclude_regions": [region],
+                "exclusions": [
+                    {
+                        "id": "excluded-001",
+                        "label": "recognizable-majority",
+                        "regions": [region],
+                        "missing_severity": "repairable",
+                        "visible_fraction_estimate": 0.65,
+                        "primary_content_recognizable": True,
+                        "identity_confidence": "high",
+                        "recommended_action": "ignore",
+                    }
+                ],
+                "items": [{"id": "item-001", "label": "complete", "regions": [complete]}],
+            }
+            with self.assertRaisesRegex(core.SplitError, "must be offered for repair"):
+                core.apply_plan(source, scan["scan_path"], plan, root / "result", False)
 
     def test_touching_semantic_targets_share_region_only_for_repair(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -260,6 +339,7 @@ class RouteAndRepairTests(unittest.TestCase):
             generated.save(grid)
             ingested = ingest_repair(manifest_path, "conflict-001", grid)
             self.assertEqual(ingested["status"], "needs_review")
+            self.assertEqual(ingested["delivery"]["pending_repair_images"], [])
             final = evaluate_manifest(manifest_path, "pass")
             self.assertEqual(final["status"], "success")
             self.assertIn("reconstructed", final["items"][0]["image_path"])

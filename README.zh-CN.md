@@ -24,14 +24,14 @@ UltraSplitter 将分栏图、角色多视图、联系表和简单背景的主体
 | --- | --- | --- |
 | **分布不均**<br>`success` · 4 个主体<br>4 个原图裁切，由多模态规划调整输出顺序；未生成任何像素。 | [<img src="docs/assets/case-uneven-input-preview.png" alt="分布不均的角色多视图输入" width="320">](docs/assets/case-uneven-input.png) | [<img src="docs/assets/case-uneven-output-preview.png" alt="4 张角色视图拆分结果" width="320">](docs/assets/case-uneven-output.png) |
 | **数量多、排布杂**<br>视觉复核后 `success` · 11 个主体<br>6 个原图裁切 + 5 个原像素重排；规划阶段排除了 1 条边界线伪候选。 | [<img src="docs/assets/case-dense-input-preview.png" alt="高密度武器素材输入" width="320">](docs/assets/case-dense-input.png) | [<img src="docs/assets/case-dense-output-preview.png" alt="11 件武器拆分结果" width="320">](docs/assets/case-dense-output.png) |
-| **边缘截断**<br>`awaiting_user_approval`<br>2 个可交付 · 1 个建议修复 · 5 个建议忽略。修复参考已先用掩码清除无关主体；未执行图片生成。 | [<img src="docs/assets/case-clipped-input-preview.png" alt="主体被画面边缘截断的输入" width="320">](docs/assets/case-clipped-input.png) | [<img src="docs/assets/case-clipped-output-preview.png" alt="标记可交付、待修复和建议忽略的分诊表" width="320">](docs/assets/case-clipped-output.png) |
+| **边缘截断**<br>批准补全后 `success` · 5 个主体<br>2 个原像素重排 + 3 个生成式重建；3 个身份信息不足的碎片被忽略。三个修复目标合并为一次宫格任务；第一轮因留白不足失败，第二轮通过。 | [<img src="docs/assets/case-clipped-input-preview.png" alt="主体被画面边缘截断的输入" width="320">](docs/assets/case-clipped-input.png) | [<img src="docs/assets/case-clipped-output-preview.png" alt="批准补全后交付的 5 个主体" width="320">](docs/assets/case-clipped-output.png) |
 
 ## 能力优势
 
 - **不依赖均匀宫格**——主体的位置、宽度、大小和间距不一致时，仍按内容边界定位。
 - **适用于高密度素材图**——矩形框互相重叠但前景像素可分时，组合使用原图裁切与原像素重排。
 - **让多模态模型只做关键判断**——宿主模型负责排除噪声、组合断开部件、命名排序和判断语义完整性，不让模型凭空填写像素坐标。
-- **缺失内容不会静默放行**——可修复缺失停在明确的用户批准关口；严重缺失或身份不明的碎片建议排除，不浪费生成调用。
+- **缺失内容不会静默放行**——主体可见部分达到 65% 且主要内容可识别时，必须向用户推荐审批后补全；身份信息不足的碎片才建议排除，避免浪费生成调用。
 - **保真且可追溯**——确定性路径保留原始像素；`manifest.json` 记录每张图的路由、源图坐标、评估、来源和绝对访问路径。
 - **面向 Agent 集成**——CLI 与 Skill 契约可被 Codex、Claude Code 和其他多模态编码 Agent 调用，核心包不绑定单一图片生成供应商。
 

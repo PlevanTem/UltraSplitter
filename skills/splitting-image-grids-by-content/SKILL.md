@@ -11,7 +11,7 @@ Use the host model for semantic judgment and UltraSplitter for exact source-pixe
 
 1. Infer `panels` for framed grids/turnarounds and `objects` for separated subjects on a simple background.
 2. Run `ultrasplit scan`, inspect the numbered preview, and write a plan using exact region IDs.
-3. For every clipped, contaminated, touching, or ambiguous candidate, add `visual_assessment` and choose `deliver`, `clean`, or `repair`. Put severe fragments or identity-ambiguous remnants in `exclude_regions` plus structured `exclusions` with `recommended_action: ignore`.
+3. For every clipped, contaminated, touching, or ambiguous candidate, add `visual_assessment` and choose `deliver`, `clean`, or `repair`. A clipped subject with `visible_fraction_estimate >= 0.65`, recognizable primary content, and identity confidence above `low` must be offered for repair instead of silently ignored. Put lower-visibility fragments or identity-ambiguous remnants in `exclude_regions` plus structured `exclusions` with `recommended_action: ignore`.
 4. Run `ultrasplit apply`, then inspect the source and `review/triage-sheet.png`.
 5. Treat only `delivery.images` and `review/contact-sheet.png` as deliverable. Repair and ignored previews are diagnostic evidence.
 6. Accept `source_crop` and `source_composite` only when the requested subjects are complete and unpolluted. If status is `needs_user_decision`, finish semantic triage before preparing repair.
@@ -39,6 +39,6 @@ Use `ultrasplit` directly after `python -m pip install -e .`.
 - Simple foreground masks are not semantic instance segmentation.
 - bbox overlap alone never authorizes generated reconstruction.
 - Source clipping, occlusion, or shared semantic ownership requires repair or review.
-- Edge contact alone does not prove that reconstruction is appropriate. Severe loss, missing identity anchors, and isolated fragments should default to `ignore`, not generation.
+- Edge contact alone does not prove that reconstruction is appropriate. The 0.65 visibility threshold is a repair eligibility floor, not a semantic score: the primary content must still be recognizable. Lower-visibility loss, missing identity anchors, and isolated fragments should default to `ignore`, not generation.
 - Never call an image generator before showing the bounded request and receiving user approval.
 - An unverified or exhausted result is not success.

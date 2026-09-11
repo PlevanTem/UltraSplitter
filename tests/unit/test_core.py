@@ -94,6 +94,8 @@ class CoreTests(unittest.TestCase):
                         "visual_assessment": {
                             "complete": False,
                             "missing_severity": "severe",
+                            "visible_fraction_estimate": 0.2,
+                            "primary_content_recognizable": False,
                             "recommended_action": "repair",
                         },
                     }
