@@ -2,11 +2,11 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-<img src="docs/assets/banner.gif" alt="ASCII workflow illustration: one sheet, content-aware review, individual assets" width="100%">
+<img src="docs/assets/banner.gif" alt="Illustrated workflow: one AIGC asset sheet, AI-assisted detection and review, individual ready-to-use files" width="100%">
 
 [![Quickstart](docs/assets/nav-quickstart.svg)](#quickstart) [![Showcases](docs/assets/nav-showcases.svg)](#showcases) [![Releases](docs/assets/nav-releases.svg)](https://github.com/PlevanTem/UltraSplitter/releases) [![Feedback](docs/assets/nav-issues.svg)](https://github.com/PlevanTem/UltraSplitter/issues) [![Consult / Sponsor](docs/assets/nav-support.svg)](#support)
 
-<sub>Workflow illustration · <a href="docs/assets/banner-static.png">Static view</a></sub>
+<sub>Illustrated workflow · <a href="docs/assets/banner-static.png">Static view</a></sub>
 
 **Turn AIGC sheets into individual assets your production pipeline can actually use.**
 

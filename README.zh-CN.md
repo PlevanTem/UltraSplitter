@@ -2,11 +2,11 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-<img src="docs/assets/banner.gif" alt="ASCII 流程示意：整图输入、内容定位与审核、独立资产输出" width="100%">
+<img src="docs/assets/banner.gif" alt="直观流程插画：AIGC 素材合图、AI 辅助检测与审核、独立可用文件" width="100%">
 
 [![快速开始](docs/assets/nav-quickstart.svg)](#quickstart) [![案例展示](docs/assets/nav-showcases.svg)](#showcases) [![版本发布](docs/assets/nav-releases.svg)](https://github.com/PlevanTem/UltraSplitter/releases) [![问题反馈](docs/assets/nav-issues.svg)](https://github.com/PlevanTem/UltraSplitter/issues) [![定制咨询与赞助](docs/assets/nav-support.svg)](#support)
 
-<sub>流程示意动画 · <a href="docs/assets/banner-static.png">查看静态版</a></sub>
+<sub>直观流程插画 · <a href="docs/assets/banner-static.png">查看静态版</a></sub>
 
 **把 AIGC 生成的整张方案图，变成生产流程真正能用的独立资产。**
 
