@@ -24,6 +24,9 @@ def _summary(manifest: dict[str, Any]) -> dict[str, Any]:
         "status": manifest.get("status", "unknown"),
         "review_required": bool(manifest.get("review_required", True)),
         "count": manifest.get("actual_count"),
+        "deliverable_count": manifest.get("deliverable_count", manifest.get("actual_count")),
+        "repair_candidate_count": manifest.get("repair_candidate_count", 0),
+        "ignored_count": manifest.get("ignored_count", 0),
         "routes": {
             route: sum(item.get("route") == route for item in manifest.get("items", []))
             for route in ("source_crop", "source_composite", "generated_reconstruction")

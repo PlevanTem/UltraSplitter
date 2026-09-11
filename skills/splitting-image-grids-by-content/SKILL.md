@@ -11,13 +11,14 @@ Use the host model for semantic judgment and UltraSplitter for exact source-pixe
 
 1. Infer `panels` for framed grids/turnarounds and `objects` for separated subjects on a simple background.
 2. Run `ultrasplit scan`, inspect the numbered preview, and write a plan using exact region IDs.
-3. Add `visual_assessment` only when the image visibly shows clipping, occlusion, touching subjects, or multiple subjects inside one connected component.
-4. Run `ultrasplit apply`, then inspect the source and contact sheet.
-5. Accept `source_crop` and `source_composite` only when the requested subjects are complete and unpolluted.
-6. If status is `awaiting_user_approval`, run `ultrasplit repair prepare`, show the user every conflict-group preview, reason, target count, call count, and two-attempt limit, then wait for explicit approval.
-7. After approval, record it with `ultrasplit repair approve`. Generate one regular grid per conflict group, not one image per subject, and ingest it.
-8. Compare reconstructed subjects against visible identity anchors and submit `pass`, `retryable`, or `identity_uncertain`. Never retry a group more than twice.
-9. Deliver the status, count, absolute output directory, contact sheet, manifest, and accessible image paths.
+3. For every clipped, contaminated, touching, or ambiguous candidate, add `visual_assessment` and choose `deliver`, `clean`, or `repair`. Put severe fragments or identity-ambiguous remnants in `exclude_regions` plus structured `exclusions` with `recommended_action: ignore`.
+4. Run `ultrasplit apply`, then inspect the source and `review/triage-sheet.png`.
+5. Treat only `delivery.images` and `review/contact-sheet.png` as deliverable. Repair and ignored previews are diagnostic evidence.
+6. Accept `source_crop` and `source_composite` only when the requested subjects are complete and unpolluted. If status is `needs_user_decision`, finish semantic triage before preparing repair.
+7. If status is `awaiting_user_approval`, run `ultrasplit repair prepare`; show deliverable, repair, and ignored counts, every clean repair preview plus original context, reason, target count, call count, and two-attempt limit, then wait for explicit approval.
+8. After approval, record it with `ultrasplit repair approve`. Generate one regular grid per conflict group, not one image per subject, and ingest it.
+9. Compare reconstructed subjects against visible identity anchors and submit `pass`, `retryable`, or `identity_uncertain`. Never retry a group more than twice.
+10. Deliver the status, deliverable/repair/ignored counts, absolute output directory, contact sheet, manifest, and accessible image paths.
 
 Generated completion is inferred content. Always identify it as reconstruction, never extraction or factual recovery.
 
@@ -38,5 +39,6 @@ Use `ultrasplit` directly after `python -m pip install -e .`.
 - Simple foreground masks are not semantic instance segmentation.
 - bbox overlap alone never authorizes generated reconstruction.
 - Source clipping, occlusion, or shared semantic ownership requires repair or review.
+- Edge contact alone does not prove that reconstruction is appropriate. Severe loss, missing identity anchors, and isolated fragments should default to `ignore`, not generation.
 - Never call an image generator before showing the bounded request and receiving user approval.
 - An unverified or exhausted result is not success.

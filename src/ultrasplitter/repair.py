@@ -29,7 +29,7 @@ Targets in row-major order: {ids}
 Output layout: {layout['rows']} rows x {layout['columns']} columns.
 
 Requirements:
-The reference may be a montage of multiple dispute-region crops; target IDs define their row-major identity.
+The clean source montage isolates the targets; the context image preserves their original surroundings. Target IDs define row-major identity.
 1. Put exactly one target in each used equal-sized cell, in the specified order.
 2. Remove every unrelated object, fragment, caption, border, label, and watermark.
 3. Conservatively complete parts clipped by the source edge or hidden by other elements.
@@ -46,6 +46,30 @@ def _reference_images(
     source: Image.Image, item_map: dict[str, dict[str, Any]], group: dict[str, Any]
 ) -> tuple[Image.Image, Image.Image, str]:
     boxes = [item_map[item_id]["bbox"] for item_id in group["item_ids"]]
+    if all(item_map[item_id].get("review_image_path") for item_id in group["item_ids"]):
+        rows, columns = group["layout"]["rows"], group["layout"]["columns"]
+        cell = 512
+        clean = Image.new("RGBA", (columns * cell, rows * cell), "white")
+        target_map = Image.new("RGBA", clean.size, "white")
+        draw = ImageDraw.Draw(target_map, "RGBA")
+        font = readable_font(20)
+        for index, item_id in enumerate(group["item_ids"]):
+            with Image.open(item_map[item_id]["review_image_path"]) as opened:
+                snippet = opened.convert("RGBA")
+            snippet.thumbnail((cell - 48, cell - 72), Image.Resampling.LANCZOS)
+            row, column = divmod(index, columns)
+            x = column * cell + (cell - snippet.width) // 2
+            y = row * cell + 44 + (cell - 44 - snippet.height) // 2
+            clean.alpha_composite(snippet, (x, y))
+            target_map.alpha_composite(snippet, (x, y))
+            draw.rectangle(
+                (column * cell + 8, row * cell + 8, (column + 1) * cell - 8, (row + 1) * cell - 8),
+                outline=(230, 40, 40, 255),
+                width=3,
+            )
+            draw.text((column * cell + 18, row * cell + 16), item_id, fill=(230, 40, 40, 255), font=font)
+        return clean, target_map, "isolated_reference_montage"
+
     union = _expanded_crop(group["source_bbox"], source.width, source.height)
     union_area = max(1, (union[2] - union[0]) * (union[3] - union[1]))
     item_area = max(1, sum((box[2] - box[0]) * (box[3] - box[1]) for box in boxes))
@@ -92,11 +116,15 @@ def prepare_repair(manifest_path: Path) -> dict[str, Any]:
         group_dir = repair_root / group["id"]
         group_dir.mkdir(parents=True, exist_ok=True)
         source_path = group_dir / "source.png"
+        context_path = group_dir / "context.png"
         target_map_path = group_dir / "target-map.png"
         prompt_path = group_dir / "prompt.txt"
         request_path = group_dir / "request.json"
         crop, target_map, source_mode = _reference_images(source, item_map, group)
+        context_box = _expanded_crop(group["source_bbox"], source.width, source.height)
+        context = source.crop(tuple(context_box))
         crop.save(source_path, format="PNG", optimize=True)
+        context.save(context_path, format="PNG", optimize=True)
         target_map.save(target_map_path, format="PNG", optimize=True)
         prompt = _prompt(group)
         prompt_path.write_text(prompt, encoding="utf-8")
@@ -109,6 +137,7 @@ def prepare_repair(manifest_path: Path) -> dict[str, Any]:
             "source_mode": source_mode,
             "source_bboxes": [item_map[item_id]["bbox"] for item_id in group["item_ids"]],
             "source": str(source_path.resolve()),
+            "context": str(context_path.resolve()),
             "target_map": str(target_map_path.resolve()),
             "prompt": str(prompt_path.resolve()),
             "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
@@ -118,6 +147,7 @@ def prepare_repair(manifest_path: Path) -> dict[str, Any]:
         group["state"] = "prepared"
         group["artifacts"] = {
             "source": str(source_path.resolve()),
+            "context": str(context_path.resolve()),
             "target_map": str(target_map_path.resolve()),
             "prompt": str(prompt_path.resolve()),
             "request": str(request_path.resolve()),
@@ -126,7 +156,19 @@ def prepare_repair(manifest_path: Path) -> dict[str, Any]:
     manifest["status"] = "awaiting_user_approval" if prepared else manifest["status"]
     manifest["review_required"] = manifest["status"] != "success"
     write_json(manifest_path, manifest)
-    return {"status": manifest["status"], "requests": prepared, "manifest": str(manifest_path.resolve())}
+    return {
+        "status": manifest["status"],
+        "summary": {
+            "deliverable_count": manifest.get("deliverable_count", 0),
+            "repair_candidate_count": manifest.get("repair_candidate_count", 0),
+            "recommended_ignored_count": manifest.get("ignored_count", 0),
+            "estimated_generation_calls": len(prepared),
+            "max_attempts_per_group": MAX_REPAIR_ATTEMPTS,
+            "triage_sheet": manifest.get("delivery", {}).get("triage_sheet"),
+        },
+        "requests": prepared,
+        "manifest": str(manifest_path.resolve()),
+    }
 
 
 def approve_repair(manifest_path: Path, group_id: str, approved_by: str = "user") -> dict[str, Any]:
@@ -203,12 +245,18 @@ def ingest_repair(manifest_path: Path, group_id: str, grid_path: Path) -> dict[s
         grid.crop(box).save(target, format="PNG", optimize=True)
         item_map[item_id]["original_source_path"] = item_map[item_id]["image_path"]
         item_map[item_id]["image_path"] = str(target.resolve())
+        item_map[item_id]["deliverable"] = True
         item_map[item_id]["provenance"].update(
             {"origin": "generated_reconstruction", "repair_group": group_id, "attempt": attempt_number}
         )
     group["state"] = "ingested"
-    manifest["delivery"]["images"] = [item["image_path"] for item in manifest["items"]]
-    make_contact_sheet(manifest["items"], Path(manifest["delivery"]["contact_sheet"]))
+    deliverable_items = [item for item in manifest["items"] if item.get("deliverable")]
+    manifest["delivery"]["images"] = [item["image_path"] for item in deliverable_items]
+    manifest["delivery"]["alpha_images"] = [
+        item["rgba_path"] for item in deliverable_items if item.get("rgba_path")
+    ]
+    manifest["deliverable_count"] = len(deliverable_items)
+    make_contact_sheet(deliverable_items, Path(manifest["delivery"]["contact_sheet"]))
     write_json(manifest_path, manifest)
     manifest = evaluate_manifest(manifest_path)
     return {"status": manifest["status"], "evaluation": evaluation, "delivery": manifest["delivery"]}

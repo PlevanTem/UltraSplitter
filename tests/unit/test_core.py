@@ -72,6 +72,36 @@ class CoreTests(unittest.TestCase):
             parsed = json.loads(result["scan_path"].read_text(encoding="utf-8"))
             self.assertEqual(parsed["schema_version"], 3)
 
+    def test_severe_subject_cannot_be_retained_as_repair_item(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "severe.png"
+            image = Image.new("RGB", (180, 120), "white")
+            ImageDraw.Draw(image).rectangle((0, 35, 45, 90), fill="purple")
+            image.save(source)
+            scan = core.scan_image(source, root / "scan", "objects", None, 32, 0.0005, 1000, False)
+            candidate = scan["scan"]["candidate_sets"][0]
+            plan = {
+                "schema_version": 3,
+                "mode": "objects",
+                "candidate_set": candidate["id"],
+                "expected_count": 1,
+                "items": [
+                    {
+                        "id": "item-001",
+                        "label": "fragment",
+                        "regions": [candidate["regions"][0]["id"]],
+                        "visual_assessment": {
+                            "complete": False,
+                            "missing_severity": "severe",
+                            "recommended_action": "repair",
+                        },
+                    }
+                ],
+            }
+            with self.assertRaisesRegex(core.SplitError, "must be moved to exclusions"):
+                core.apply_plan(source, scan["scan_path"], plan, root / "result", False)
+
 
 if __name__ == "__main__":
     unittest.main()

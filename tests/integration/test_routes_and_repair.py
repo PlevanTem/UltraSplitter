@@ -19,6 +19,34 @@ def apply_auto(source: Path, root: Path, mode: str = "objects") -> tuple[dict, P
     return route_manifest(result["manifest_path"]), result["manifest_path"]
 
 
+def apply_repair_eligible(source: Path, root: Path) -> tuple[dict, Path]:
+    scan = core.scan_image(source, root / "scan", "objects", None, 32, 0.0005, 1000, False)
+    region = scan["scan"]["candidate_sets"][0]["regions"][0]["id"]
+    plan = {
+        "schema_version": 3,
+        "mode": "objects",
+        "candidate_set": scan["scan"]["candidate_sets"][0]["id"],
+        "expected_count": 1,
+        "items": [
+            {
+                "id": "item-001",
+                "label": "repairable",
+                "regions": [region],
+                "visual_assessment": {
+                    "complete": False,
+                    "missing_severity": "repairable",
+                    "visible_fraction_estimate": 0.75,
+                    "critical_parts_missing": [],
+                    "identity_confidence": "high",
+                    "recommended_action": "repair",
+                },
+            }
+        ],
+    }
+    result = core.apply_plan(source, scan["scan_path"], plan, root / "result", False)
+    return route_manifest(result["manifest_path"]), result["manifest_path"]
+
+
 class RouteAndRepairTests(unittest.TestCase):
     def test_overlapping_boxes_with_disjoint_foreground_use_source_composite(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -44,13 +72,128 @@ class RouteAndRepairTests(unittest.TestCase):
             image = Image.new("RGB", (220, 160), "white")
             ImageDraw.Draw(image).rectangle((0, 30, 80, 130), fill="purple")
             image.save(source)
-            manifest, manifest_path = apply_auto(source, root)
+            manifest, manifest_path = apply_repair_eligible(source, root)
             self.assertEqual(manifest["status"], "awaiting_user_approval")
             self.assertEqual(manifest["items"][0]["route"], "generated_reconstruction")
+            self.assertFalse(manifest["items"][0]["deliverable"])
+            self.assertEqual(manifest["delivery"]["images"], [])
             packet = prepare_repair(manifest_path)
             self.assertEqual(packet["status"], "awaiting_user_approval")
             self.assertTrue(Path(packet["requests"][0]["source"]).is_file())
+            self.assertTrue(Path(packet["requests"][0]["context"]).is_file())
             self.assertTrue(Path(packet["requests"][0]["target_map"]).is_file())
+
+    def test_unassessed_clipped_source_requires_semantic_triage(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "clipped.png"
+            image = Image.new("RGB", (220, 160), "white")
+            ImageDraw.Draw(image).rectangle((0, 30, 80, 130), fill="purple")
+            image.save(source)
+            manifest, _ = apply_auto(source, root)
+            self.assertEqual(manifest["status"], "needs_user_decision")
+            self.assertEqual(manifest["conflict_groups"], [])
+            self.assertEqual(manifest["approval"]["estimated_generation_calls"], 0)
+            self.assertEqual(manifest["delivery"]["images"], [])
+            self.assertTrue(Path(manifest["delivery"]["triage_sheet"]).is_file())
+            reevaluated = evaluate_manifest(Path(manifest["delivery"]["manifest"]), "pass")
+            self.assertEqual(reevaluated["status"], "needs_user_decision")
+
+    def test_severe_fragments_are_ignored_and_never_enter_repair(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "mixed.png"
+            image = Image.new("RGB", (320, 220), "white")
+            draw = ImageDraw.Draw(image)
+            draw.ellipse((120, 55, 215, 170), fill="green")
+            draw.rectangle((0, 175, 35, 219), fill="purple")
+            image.save(source)
+            scan = core.scan_image(source, root / "scan", "objects", None, 32, 0.0005, 1000, False)
+            candidate = scan["scan"]["candidate_sets"][0]
+            complete = next(region for region in candidate["regions"] if "source_clipped" not in region["flags"])
+            fragment = next(region for region in candidate["regions"] if "source_clipped" in region["flags"])
+            plan = {
+                "schema_version": 3,
+                "mode": "objects",
+                "candidate_set": candidate["id"],
+                "expected_count": 1,
+                "exclude_regions": [fragment["id"]],
+                "exclusions": [
+                    {
+                        "id": "excluded-001",
+                        "label": "severe-fragment",
+                        "regions": [fragment["id"]],
+                        "missing_severity": "severe",
+                        "visible_fraction_estimate": 0.15,
+                        "critical_parts_missing": ["identity"],
+                        "recommended_action": "ignore",
+                        "reason": ["insufficient_identity_evidence"],
+                    }
+                ],
+                "items": [{"id": "item-001", "label": "complete", "regions": [complete["id"]]}],
+            }
+            result = core.apply_plan(source, scan["scan_path"], plan, root / "result", False)
+            manifest = route_manifest(result["manifest_path"])
+            self.assertEqual(manifest["conflict_groups"], [])
+            self.assertEqual(manifest["repair_candidate_count"], 0)
+            self.assertEqual(manifest["ignored_count"], 1)
+            self.assertEqual(manifest["deliverable_count"], 1)
+            self.assertEqual(len(manifest["delivery"]["images"]), 1)
+            self.assertEqual(len(manifest["delivery"]["ignored_images"]), 1)
+
+    def test_repair_preview_removes_unrelated_foreground(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "contaminated.png"
+            image = Image.new("RGB", (240, 180), "white")
+            draw = ImageDraw.Draw(image)
+            draw.line([(0, 20), (110, 20), (110, 155), (0, 155)], fill="purple", width=12)
+            draw.ellipse((40, 65, 75, 105), fill="orange")
+            image.save(source)
+            scan = core.scan_image(source, root / "scan", "objects", None, 32, 0.0005, 1000, False)
+            candidate = scan["scan"]["candidate_sets"][0]
+            clipped = next(region for region in candidate["regions"] if "source_clipped" in region["flags"])
+            inner = next(region for region in candidate["regions"] if "source_clipped" not in region["flags"])
+            assessment = {
+                "complete": False,
+                "missing_severity": "repairable",
+                "visible_fraction_estimate": 0.8,
+                "identity_confidence": "high",
+                "recommended_action": "repair",
+            }
+            plan = {
+                "schema_version": 3,
+                "mode": "objects",
+                "candidate_set": candidate["id"],
+                "expected_count": 2,
+                "items": [
+                    {"id": "item-001", "label": "frame", "regions": [clipped["id"]], "visual_assessment": assessment},
+                    {
+                        "id": "item-002",
+                        "label": "inner",
+                        "regions": [inner["id"]],
+                        "visual_assessment": {
+                            "complete": True,
+                            "semantic_subject_count": 1,
+                            "confidence": "high",
+                            "recommended_action": "clean",
+                        },
+                    },
+                ],
+            }
+            result = core.apply_plan(source, scan["scan_path"], plan, root / "result", False)
+            manifest = route_manifest(result["manifest_path"])
+            repair_item = manifest["items"][0]
+            self.assertFalse(repair_item["deliverable"])
+            self.assertNotIn(repair_item["image_path"], manifest["delivery"]["images"])
+            with Image.open(repair_item["review_image_path"]) as preview:
+                pixels = preview.convert("RGB").tobytes()
+                orange_pixels = sum(
+                    1
+                    for red, green, blue in zip(pixels[0::3], pixels[1::3], pixels[2::3])
+                    if red > 180 and 60 < green < 190 and blue < 80
+                )
+            self.assertEqual(orange_pixels, 0)
 
     def test_touching_semantic_targets_share_region_only_for_repair(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -87,7 +230,7 @@ class RouteAndRepairTests(unittest.TestCase):
             image = Image.new("RGB", (220, 160), "white")
             ImageDraw.Draw(image).rectangle((0, 30, 80, 130), fill="purple")
             image.save(source)
-            _, manifest_path = apply_auto(source, root)
+            _, manifest_path = apply_repair_eligible(source, root)
             prepare_repair(manifest_path)
             invalid = root / "invalid.png"
             Image.new("RGB", (512, 512), "white").save(invalid)
@@ -108,7 +251,7 @@ class RouteAndRepairTests(unittest.TestCase):
             image = Image.new("RGB", (220, 160), "white")
             ImageDraw.Draw(image).rectangle((0, 30, 80, 130), fill="purple")
             image.save(source)
-            _, manifest_path = apply_auto(source, root)
+            _, manifest_path = apply_repair_eligible(source, root)
             prepare_repair(manifest_path)
             approve_repair(manifest_path, "conflict-001")
             grid = root / "valid.png"

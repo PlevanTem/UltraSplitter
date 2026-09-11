@@ -632,6 +632,11 @@ def edge_dark_fraction(image: Image.Image, side: str, threshold: int = 100) -> f
 
 def make_contact_sheet(items: list[dict[str, Any]], output_path: Path) -> None:
     if not items:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        canvas = Image.new("RGB", (600, 160), "#ececec")
+        draw = ImageDraw.Draw(canvas)
+        draw.text((24, 68), "No deliverable assets yet", fill="#555555", font=readable_font(18))
+        canvas.save(output_path, format="PNG", optimize=True)
         return
     columns = min(4, len(items))
     rows = math.ceil(len(items) / columns)
@@ -690,6 +695,35 @@ def apply_plan(
     if unknown_excluded:
         raise SplitError(f"plan excludes unknown regions: {', '.join(unknown_excluded)}")
 
+    exclusions = plan.get("exclusions", [])
+    if not isinstance(exclusions, list):
+        raise SplitError("plan.exclusions must be an array")
+    described_exclusions: set[str] = set()
+    for index, exclusion in enumerate(exclusions, 1):
+        if not isinstance(exclusion, dict):
+            raise SplitError(f"exclusion {index} must be an object")
+        region_ids = exclusion.get("regions")
+        if not isinstance(region_ids, list) or not region_ids:
+            raise SplitError(f"exclusion {index} must contain region ids")
+        unknown = [region_id for region_id in region_ids if region_id not in region_map]
+        if unknown:
+            raise SplitError(f"exclusion {index} references unknown regions: {', '.join(unknown)}")
+        not_excluded = [region_id for region_id in region_ids if region_id not in excluded_regions]
+        if not_excluded:
+            raise SplitError(
+                f"exclusion {index} regions must also appear in exclude_regions: {', '.join(not_excluded)}"
+            )
+        duplicates = [region_id for region_id in region_ids if region_id in described_exclusions]
+        if duplicates:
+            raise SplitError(f"exclusion regions cannot be described twice: {', '.join(duplicates)}")
+        described_exclusions.update(region_ids)
+        action = exclusion.get("recommended_action", "ignore")
+        if action != "ignore":
+            raise SplitError(f"exclusion {index} recommended_action must be ignore")
+        visible = exclusion.get("visible_fraction_estimate")
+        if visible is not None and (not isinstance(visible, (int, float)) or not 0 <= visible <= 1):
+            raise SplitError(f"exclusion {index} visible_fraction_estimate must be between 0 and 1")
+
     background_uniformity = float(candidate.get("evidence", {}).get("background_uniformity", 1.0))
     should_emit_alpha = emit in {"rgba", "all"} or (
         emit == "auto" and candidate["kind"] == "objects" and background_uniformity >= 0.8
@@ -712,6 +746,26 @@ def apply_plan(
         if duplicate and not plan.get("allow_shared_regions_for_repair", False):
             raise SplitError(f"regions cannot appear in multiple items: {', '.join(duplicate)}")
         used_regions.update(region_ids)
+        assessment = item.get("visual_assessment", {})
+        if assessment is not None and not isinstance(assessment, dict):
+            raise SplitError(f"item {index} visual_assessment must be an object")
+        if isinstance(assessment, dict):
+            action = assessment.get("recommended_action")
+            if action not in {None, "deliver", "clean", "repair"}:
+                raise SplitError(
+                    f"item {index} recommended_action must be deliver, clean, or repair; "
+                    "ignored subjects belong in exclusions"
+                )
+            severity = assessment.get("missing_severity")
+            if severity not in {None, "none", "minor", "repairable", "severe"}:
+                raise SplitError(
+                    f"item {index} missing_severity must be none, minor, repairable, or severe"
+                )
+            if severity == "severe":
+                raise SplitError(f"item {index} is severely incomplete and must be moved to exclusions")
+            visible = assessment.get("visible_fraction_estimate")
+            if visible is not None and (not isinstance(visible, (int, float)) or not 0 <= visible <= 1):
+                raise SplitError(f"item {index} visible_fraction_estimate must be between 0 and 1")
 
     overlap_with_outputs = sorted(set(excluded_regions) & used_regions)
     if overlap_with_outputs:
@@ -837,6 +891,21 @@ def apply_plan(
         "delivery": delivery,
         "items": output_items,
         "excluded_regions": excluded_regions,
+        "exclusions": [
+            {
+                **exclusion,
+                "id": str(exclusion.get("id", f"excluded-{index:03d}")),
+                "label": safe_label(str(exclusion.get("label", "")), f"excluded-{index:03d}"),
+                "recommended_action": "ignore",
+                "bbox": union_boxes(
+                    [region_map[region_id]["bbox"] for region_id in exclusion["regions"]],
+                    image.width,
+                    image.height,
+                    0.0,
+                ),
+            }
+            for index, exclusion in enumerate(exclusions, 1)
+        ],
         "warnings": global_warnings,
         "verifier_instruction": (
             "Compare the original image with review/contact-sheet.png. Check count, missing regions, subject cuts, "

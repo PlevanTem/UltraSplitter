@@ -116,6 +116,11 @@ def evaluate_manifest(manifest_path: Path, visual_verdict: str | None = None) ->
     if visual_verdict not in {None, "pass", "retryable", "identity_uncertain"}:
         raise ValueError("visual verdict must be pass, retryable, or identity_uncertain")
     groups = manifest.get("conflict_groups", [])
+    untriaged = [
+        item
+        for item in manifest.get("items", [])
+        if item.get("routing_evidence", {}).get("repair_eligibility") == "needs_semantic_triage"
+    ]
     pending = [group for group in groups if group.get("state") not in {"ingested", "not_required"}]
     latest_attempts: dict[str, dict[str, Any]] = {}
     for attempt in manifest.get("repair_attempts", []):
@@ -130,7 +135,9 @@ def evaluate_manifest(manifest_path: Path, visual_verdict: str | None = None) ->
     manifest.setdefault("evaluation", {})["visual"] = visual_verdict or manifest["evaluation"].get(
         "visual", "not_run"
     )
-    if pending and manifest.get("approval", {}).get("state") != "approved":
+    if untriaged:
+        manifest["status"] = "needs_user_decision"
+    elif pending and manifest.get("approval", {}).get("state") != "approved":
         manifest["status"] = "awaiting_user_approval"
     elif any(
         len([attempt for attempt in manifest.get("repair_attempts", []) if attempt["group_id"] == group["id"]])

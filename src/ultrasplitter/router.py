@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .contracts import MAX_SUBJECTS_PER_REPAIR_GRID, load_json, require_v3, write_json
-from .core import make_contact_sheet
+from .core import load_image, make_contact_sheet
 from .extractor import compose_source_item
 
 
@@ -54,6 +54,35 @@ def _visual_requires_generation(plan_item: dict[str, Any]) -> list[str]:
     return reasons
 
 
+def _repair_eligibility(plan_item: dict[str, Any], source_clipped: bool) -> tuple[str, list[str]]:
+    """Separate repair-worthy loss from clipping that still needs semantic triage."""
+    assessment = plan_item.get("visual_assessment", {})
+    if not isinstance(assessment, dict):
+        assessment = {}
+    reasons = _visual_requires_generation(plan_item)
+    action = assessment.get("recommended_action")
+    severity = assessment.get("missing_severity")
+    confidence = assessment.get("identity_confidence", assessment.get("confidence"))
+    visibly_complete = assessment.get("complete") is True
+
+    if action in {"deliver", "clean"} and visibly_complete and confidence == "high":
+        return "not_required", []
+    if action == "repair" or severity in {"minor", "repairable"}:
+        if source_clipped:
+            reasons.append("source_clipped")
+        return "eligible", sorted(set(reasons or ["visually_incomplete"]))
+    if reasons:
+        # Backward-compatible explicit assessments such as complete=false or touching=true
+        # remain repair eligible even when the newer severity fields are absent.
+        if assessment:
+            if source_clipped:
+                reasons.append("source_clipped")
+            return "eligible", sorted(set(reasons))
+    if source_clipped:
+        return "needs_semantic_triage", ["source_clipped", "semantic_triage_required"]
+    return "not_required", []
+
+
 def route_manifest(manifest_path: Path) -> dict[str, Any]:
     manifest = load_json(manifest_path)
     require_v3(manifest)
@@ -71,9 +100,10 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
     }
 
     generation_items: list[dict[str, Any]] = []
+    triage_items: list[dict[str, Any]] = []
     for item in manifest["items"]:
-        reasons = [warning for warning in item.get("warnings", []) if warning == "source_clipped"]
-        reasons.extend(_visual_requires_generation(plan_items.get(item["id"], {})))
+        source_clipped = "source_clipped" in item.get("warnings", [])
+        eligibility, reasons = _repair_eligibility(plan_items.get(item["id"], {}), source_clipped)
         bbox_overlaps = sorted(
             other["id"]
             for other in manifest["items"]
@@ -83,14 +113,19 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
             "bbox_overlaps": bbox_overlaps,
             "bbox_overlap_is_warning_only": True,
             "generation_reasons": sorted(set(reasons)),
+            "repair_eligibility": eligibility,
         }
-        if reasons:
+        if eligibility in {"eligible", "needs_semantic_triage"}:
             item["route"] = "generated_reconstruction"
-            generation_items.append(item)
+            if eligibility == "eligible":
+                generation_items.append(item)
+            else:
+                triage_items.append(item)
         elif candidate["kind"] == "objects" and bbox_overlaps:
             item["route"] = "source_composite"
         else:
             item["route"] = "source_crop"
+        item["deliverable"] = item["route"] != "generated_reconstruction"
         item["provenance"] = {
             "origin": item["route"],
             "source_sha256": manifest["source"]["sha256"],
@@ -99,23 +134,69 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
 
     composite_dir = manifest_path.parent / "images" / "source-composite"
     alpha_dir = manifest_path.parent / "alpha" / "source-composite"
+    isolated_dir = manifest_path.parent / "review" / "isolated"
+    isolated_alpha_dir = manifest_path.parent / "review" / "isolated-alpha"
     for item in manifest["items"]:
-        if item["route"] != "source_composite":
+        if item["route"] not in {"source_composite", "generated_reconstruction"}:
             continue
         filename = Path(item["image_path"]).name
-        item["original_source_path"] = item["image_path"]
-        metrics = compose_source_item(
-            Path(manifest["source"]["path"]),
-            item,
-            [region_map[region_id]["bbox"] for region_id in item["regions"]],
-            candidate["evidence"].get("background_rgba", [255, 255, 255, 255]),
-            int(candidate["evidence"].get("background_tolerance", 32)),
-            composite_dir / filename,
-            alpha_dir / filename,
+        if candidate["kind"] != "objects":
+            item["review_image_path"] = item["image_path"]
+            continue
+        output_path = composite_dir / filename if item["route"] == "source_composite" else isolated_dir / filename
+        output_alpha = alpha_dir / filename if item["route"] == "source_composite" else isolated_alpha_dir / filename
+        try:
+            metrics = compose_source_item(
+                Path(manifest["source"]["path"]),
+                item,
+                [region_map[region_id]["bbox"] for region_id in item["regions"]],
+                candidate["evidence"].get("background_rgba", [255, 255, 255, 255]),
+                int(candidate["evidence"].get("background_tolerance", 32)),
+                output_path,
+                output_alpha,
+            )
+            item.setdefault("evaluation", {}).update(metrics)
+            if item["route"] == "source_composite":
+                item["original_source_path"] = item["image_path"]
+                item["image_path"] = str(output_path.resolve())
+                item["rgba_path"] = str(output_alpha.resolve())
+            else:
+                item["review_image_path"] = str(output_path.resolve())
+                item["review_alpha_path"] = str(output_alpha.resolve())
+        except ValueError as exc:
+            item["review_image_path"] = item["image_path"]
+            warning = f"mask_cleanup_failed:{exc}"
+            item.setdefault("warnings", []).append(warning)
+            manifest.setdefault("warnings", []).append(f"{item['label']}:{warning}")
+
+    ignored_preview_items: list[dict[str, Any]] = []
+    source = load_image(Path(manifest["source"]["path"]))
+    ignored_dir = manifest_path.parent / "review" / "ignored"
+    ignored_alpha_dir = manifest_path.parent / "review" / "ignored-alpha"
+    for exclusion in manifest.get("exclusions", []):
+        filename = f"{exclusion['label']}.png"
+        fake_item = {"id": exclusion["id"], "bbox": exclusion["bbox"]}
+        output_path = ignored_dir / filename
+        output_alpha = ignored_alpha_dir / filename
+        try:
+            if candidate["kind"] != "objects":
+                raise ValueError("mask cleanup is available only for object candidates")
+            compose_source_item(
+                Path(manifest["source"]["path"]),
+                fake_item,
+                [region_map[region_id]["bbox"] for region_id in exclusion["regions"]],
+                candidate["evidence"].get("background_rgba", [255, 255, 255, 255]),
+                int(candidate["evidence"].get("background_tolerance", 32)),
+                output_path,
+                output_alpha,
+            )
+        except ValueError:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            source.crop(tuple(exclusion["bbox"])).save(output_path, format="PNG", optimize=True)
+        exclusion["review_image_path"] = str(output_path.resolve())
+        ignored_preview_items.append(
+            {"label": f"[ignore] {exclusion['label']}", "image_path": str(output_path.resolve())}
         )
-        item["image_path"] = str((composite_dir / filename).resolve())
-        item["rgba_path"] = str((alpha_dir / filename).resolve())
-        item.setdefault("evaluation", {}).update(metrics)
 
     item_map = {item["id"]: item for item in manifest["items"]}
     # Connected conflict groups use spatially expanded source boxes, then split at six subjects.
@@ -187,11 +268,14 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
         "approved_groups": [],
         "max_attempts_per_group": 2,
         "estimated_generation_calls": len(requested),
+        "repair_item_count": len(generation_items),
+        "recommended_ignored_count": len(manifest.get("exclusions", [])),
     }
     manifest.setdefault("repair_attempts", [])
-    manifest["delivery"]["images"] = [item["image_path"] for item in manifest["items"]]
+    deliverable_items = [item for item in manifest["items"] if item.get("deliverable")]
+    manifest["delivery"]["images"] = [item["image_path"] for item in deliverable_items]
     manifest["delivery"]["alpha_images"] = [
-        item["rgba_path"] for item in manifest["items"] if item.get("rgba_path")
+        item["rgba_path"] for item in deliverable_items if item.get("rgba_path")
     ]
     non_generation_warnings = [
         warning for warning in manifest.get("warnings", []) if not warning.endswith(":source_clipped")
@@ -204,14 +288,17 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
             isinstance(assessment, dict)
             and assessment.get("complete") is True
             and int(assessment.get("semantic_subject_count", 1)) == 1
-            and assessment.get("confidence") == "high"
+            and assessment.get("identity_confidence", assessment.get("confidence")) == "high"
         )
         if not confirmed:
             warning = f"{item['label']}:semantic_assessment_required_for_composite"
             item.setdefault("warnings", []).append("semantic_assessment_required_for_composite")
             non_generation_warnings.append(warning)
             manifest.setdefault("warnings", []).append(warning)
-    if requested:
+    if triage_items:
+        manifest["status"] = "needs_user_decision"
+        manifest["review_required"] = True
+    elif requested:
         manifest["status"] = "awaiting_user_approval"
         manifest["review_required"] = True
     elif non_generation_warnings:
@@ -230,6 +317,32 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
             "max_repair_attempts": 2,
         },
     }
-    make_contact_sheet(manifest["items"], Path(manifest["delivery"]["contact_sheet"]))
+    triage_sheet = manifest_path.parent / "review" / "triage-sheet.png"
+    triage_preview_items = []
+    for item in manifest["items"]:
+        if item.get("deliverable"):
+            state = "deliver"
+        elif item["routing_evidence"]["repair_eligibility"] == "eligible":
+            state = "repair"
+        else:
+            state = "triage"
+        triage_preview_items.append(
+            {
+                "label": f"[{state}] {item['label']}",
+                "image_path": item.get("review_image_path", item["image_path"]),
+            }
+        )
+    triage_preview_items.extend(ignored_preview_items)
+    make_contact_sheet(triage_preview_items, triage_sheet)
+    make_contact_sheet(deliverable_items, Path(manifest["delivery"]["contact_sheet"]))
+    manifest["delivery"]["triage_sheet"] = str(triage_sheet.resolve())
+    manifest["delivery"]["pending_repair_images"] = [
+        item.get("review_image_path", item["image_path"])
+        for item in generation_items
+    ]
+    manifest["delivery"]["ignored_images"] = [item["image_path"] for item in ignored_preview_items]
+    manifest["deliverable_count"] = len(deliverable_items)
+    manifest["repair_candidate_count"] = len(generation_items)
+    manifest["ignored_count"] = len(manifest.get("exclusions", []))
     write_json(manifest_path, manifest)
     return manifest

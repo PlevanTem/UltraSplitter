@@ -14,22 +14,24 @@ UltraSplitter 将分栏图、角色多视图、联系表和简单背景的主体
 2. **原像素重排（Source composite）**——检测框重叠但前景轮廓可分离时，提取原始前景并放置到干净画布。
 3. **生成式重建（Generated reconstruction）**——像素缺失或主体无法分离时，生成可审计的修复包；执行生成前必须由 Agent 获得用户批准。
 
+路由前的多模态分诊会排除噪声、建议忽略严重残缺片段，并阻止未经语义判断的触边候选自动进入生成请求。
+
 ## 实测案例
 
-以下结果均由当前工作流实际运行产生。每个案例只展示一张输出联系表，所有预览统一使用 8:5 画布；点击输入或输出可打开完整图片。
+以下结果均由当前工作流实际运行产生。每个案例只展示一张结果图：成功案例展示交付联系表，需要批准的案例展示带分类标签的分诊表。所有预览统一使用 8:5 画布；点击输入或结果可打开完整图片。
 
-| 案例与实测结果 | 输入 | 输出 |
+| 案例与实测结果 | 输入 | 结果 |
 | --- | --- | --- |
 | **分布不均**<br>`success` · 4 个主体<br>4 个原图裁切，由多模态规划调整输出顺序；未生成任何像素。 | [<img src="docs/assets/case-uneven-input-preview.png" alt="分布不均的角色多视图输入" width="320">](docs/assets/case-uneven-input.png) | [<img src="docs/assets/case-uneven-output-preview.png" alt="4 张角色视图拆分结果" width="320">](docs/assets/case-uneven-output.png) |
 | **数量多、排布杂**<br>视觉复核后 `success` · 11 个主体<br>6 个原图裁切 + 5 个原像素重排；规划阶段排除了 1 条边界线伪候选。 | [<img src="docs/assets/case-dense-input-preview.png" alt="高密度武器素材输入" width="320">](docs/assets/case-dense-input.png) | [<img src="docs/assets/case-dense-output-preview.png" alt="11 件武器拆分结果" width="320">](docs/assets/case-dense-output.png) |
-| **边缘截断**<br>`awaiting_user_approval` · 8 个候选<br>识别到 6 个边缘截断候选并归入 2 个修复请求；未执行图片生成。 | [<img src="docs/assets/case-clipped-input-preview.png" alt="主体被画面边缘截断的输入" width="320">](docs/assets/case-clipped-input.png) | [<img src="docs/assets/case-clipped-output-preview.png" alt="等待修复批准的暂存拆分联系表" width="320">](docs/assets/case-clipped-output.png) |
+| **边缘截断**<br>`awaiting_user_approval`<br>2 个可交付 · 1 个建议修复 · 5 个建议忽略。修复参考已先用掩码清除无关主体；未执行图片生成。 | [<img src="docs/assets/case-clipped-input-preview.png" alt="主体被画面边缘截断的输入" width="320">](docs/assets/case-clipped-input.png) | [<img src="docs/assets/case-clipped-output-preview.png" alt="标记可交付、待修复和建议忽略的分诊表" width="320">](docs/assets/case-clipped-output.png) |
 
 ## 能力优势
 
 - **不依赖均匀宫格**——主体的位置、宽度、大小和间距不一致时，仍按内容边界定位。
 - **适用于高密度素材图**——矩形框互相重叠但前景像素可分时，组合使用原图裁切与原像素重排。
 - **让多模态模型只做关键判断**——宿主模型负责排除噪声、组合断开部件、命名排序和判断语义完整性，不让模型凭空填写像素坐标。
-- **缺失内容不会静默放行**——遇到截断、遮挡或不可分离主体时，停在明确的用户批准关口，不把残缺素材当成成功结果交付。
+- **缺失内容不会静默放行**——可修复缺失停在明确的用户批准关口；严重缺失或身份不明的碎片建议排除，不浪费生成调用。
 - **保真且可追溯**——确定性路径保留原始像素；`manifest.json` 记录每张图的路由、源图坐标、评估、来源和绝对访问路径。
 - **面向 Agent 集成**——CLI 与 Skill 契约可被 Codex、Claude Code 和其他多模态编码 Agent 调用，核心包不绑定单一图片生成供应商。
 
@@ -64,14 +66,14 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 ## 架构
 
 ```text
-图片 → 确定性扫描 → 多模态规划 → 路由
-                                ├─ 原图裁切
-                                ├─ 原像素重排
-                                └─ 修复包 → 用户批准
-                                                ↓
-                                         外部图片生成
-                                                ↓
-                                  回流 → 拆图 → 评估 → 退出
+图片 → 确定性扫描 → 多模态分诊与规划 → 路由
+                  ├─ 忽略严重残片          ├─ 原图裁切
+                  ├─ 请求语义判断          ├─ 原像素重排
+                  └─ 标记可修复缺失        └─ 修复包 → 用户批准
+                                                        ↓
+                                                 外部图片生成
+                                                        ↓
+                                          回流 → 拆图 → 评估 → 退出
 ```
 
 每次运行都会写入 schema v3 的 `manifest.json`，记录准确的源图坐标、路由依据、来源追踪、批准状态、有界修复次数、评估结果和绝对访问路径。完整设计见 [ARCHITECTURE.md](ARCHITECTURE.md)。

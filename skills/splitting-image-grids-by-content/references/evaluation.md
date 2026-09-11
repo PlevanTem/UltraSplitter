@@ -10,6 +10,8 @@ The CLI checks expected occupied cells, cell resolution, uniform background, edg
 - missing, duplicated, merged, or added parts;
 - unrelated subjects, labels, borders, and watermarks.
 
+Evaluate only `delivery.images` as finished assets. `pending_repair_images`, `ignored_images`, and the triage sheet are review evidence. A visual `pass` cannot override an unresolved `needs_semantic_triage` item.
+
 Return:
 
 - `pass` only when deterministic checks and visible identity anchors pass;

@@ -9,18 +9,18 @@ The core package is provider-neutral. A multimodal host such as Codex or Claude 
 ## Processing model
 
 ```text
-SCAN → PLAN → APPLY → ROUTE
-                        ├─ source_crop ───────────────┐
-                        ├─ source_composite ──────────┤
-                        └─ generated_reconstruction  │
-                                   ↓                 │
-                         awaiting_user_approval      │
-                                   ↓                 │
-                         PREPARE → GENERATE → INGEST │
-                                               ↓     │
-                                            EVALUATE ┘
-                                               ↓
-                                  success / bounded exit
+SCAN → MULTIMODAL TRIAGE + PLAN → APPLY → ROUTE
+          │                                  ├─ source_crop ───────────────┐
+          ├─ deliver / clean                 ├─ source_composite ──────────┤
+          ├─ repair                          └─ generated_reconstruction  │
+          └─ ignore                                     ↓                 │
+                                              awaiting_user_approval      │
+                                                        ↓                 │
+                                              PREPARE → GENERATE → INGEST │
+                                                                    ↓     │
+                                                                 EVALUATE ┘
+                                                                    ↓
+                                                       success / bounded exit
 ```
 
 ### Scan
@@ -29,7 +29,9 @@ Panel candidates come from continuous divider/frame evidence. Object candidates 
 
 ### Plan
 
-The host chooses a candidate set and groups stable region IDs into semantic items. It may add `visual_assessment` when visible evidence shows clipping, occlusion, touching subjects, or multiple semantic subjects inside one connected component.
+The host chooses a candidate set and groups stable region IDs into semantic items. Every clipped, contaminated, touching, or ambiguous candidate requires a `visual_assessment`. The host classifies it as `deliver`, `clean`, `repair`, or `ignore` and records visible completeness, missing critical parts, identity confidence, and an advisory visible-fraction estimate.
+
+Severely incomplete or identity-ambiguous fragments belong in `exclude_regions` plus structured `exclusions`; they are not output items and never become repair requests. Visible area alone is insufficient: missing identity-defining structure outweighs a large remaining pixel area.
 
 ### Route
 
@@ -37,9 +39,21 @@ The router does not equate bbox intersection with subject overlap:
 
 - `source_crop`: complete source pixels and no relevant conflict.
 - `source_composite`: distinct connected components have intersecting rectangular extents; only the selected component pixels are retained and centered on a clean canvas.
-- `generated_reconstruction`: the source is clipped or the visual assessment reports missing, occluded, touching, or merged subjects.
+- `generated_reconstruction`: the host explicitly classifies a minor or moderately incomplete, identity-grounded subject as repairable.
 
 Simple masks can remove foreign foreground; they cannot recover pixels hidden behind another object. Any operation that invents missing pixels must use the generated route.
+
+An edge-contact flag without semantic assessment is not enough to authorize repair. It returns `needs_user_decision` with zero generation calls. A high-confidence assessment may also establish that a subject merely touches the canvas while remaining complete.
+
+## Triage and delivery separation
+
+The manifest separates three audiences:
+
+- `delivery.images` and `review/contact-sheet.png` contain only currently deliverable source or reconstructed assets;
+- `review/triage-sheet.png` labels every retained candidate as `deliver`, `repair`, or `triage`, and shows structured exclusions as `ignore`;
+- `delivery.pending_repair_images` and `delivery.ignored_images` remain review evidence and never masquerade as finished assets.
+
+Before a repair packet is prepared, simple-mask isolation removes unrelated disconnected foreground from each repair reference. The original expanded dispute region remains available as `context.png`; the clean subject montage is `source.png`.
 
 ## Conflict groups and repair packets
 
@@ -47,7 +61,8 @@ Generation candidates become nodes in a spatial conflict graph. Expanded source 
 
 `repair prepare` emits, per group:
 
-- an expanded source crop;
+- a clean, isolated source montage;
+- an expanded original context crop;
 - a target-ID preview;
 - exact target count, order, and layout;
 - a constrained reconstruction prompt;
@@ -69,7 +84,7 @@ Each conflict group permits at most two ingested attempts. A second failed attem
 
 ## Schema v3 and provenance
 
-The manifest contains the source hash, scan and plan, output items, route evidence, conflict groups, approval scope, repair attempts, evaluations, warnings, and delivery paths. Each item records exactly one origin:
+The manifest contains the source hash, scan and plan, output items, structured exclusions, route evidence, conflict groups, approval scope, repair attempts, evaluations, warnings, and delivery paths. It reports `deliverable_count`, `repair_candidate_count`, and `ignored_count`. Each retained item records exactly one origin:
 
 - `source_crop`;
 - `source_composite`;
