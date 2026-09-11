@@ -340,6 +340,10 @@ class RouteAndRepairTests(unittest.TestCase):
             ingested = ingest_repair(manifest_path, "conflict-001", grid)
             self.assertEqual(ingested["status"], "needs_review")
             self.assertEqual(ingested["delivery"]["pending_repair_images"], [])
+            self.assertEqual(
+                ingested["delivery"]["contact_sheet_layout"]["style"],
+                "compact_cards_v1",
+            )
             final = evaluate_manifest(manifest_path, "pass")
             self.assertEqual(final["status"], "success")
             self.assertIn("reconstructed", final["items"][0]["image_path"])

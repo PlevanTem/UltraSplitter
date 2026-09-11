@@ -40,6 +40,8 @@ The manifest separates three audiences:
 - `review/triage-sheet.png` labels every retained candidate as `deliver`, `repair`, or `triage`, and shows structured exclusions as `ignore`;
 - `delivery.pending_repair_images` and `delivery.ignored_images` remain review evidence and never masquerade as finished assets.
 
+Contact sheets are production presentation artifacts, not alternate asset files. They use a compact near-square card grid, a uniform canvas, label-safe cells, and longest-edge subject normalization so mixed aspect ratios remain readable. Uniform-background trimming is applied only when corner and border evidence agree; otherwise the full image is preserved. The renderer never rewrites `delivery.images`. Layout metadata is recorded under `delivery.contact_sheet_layout` and `delivery.triage_sheet_layout`.
+
 Before a repair packet is prepared, simple-mask isolation removes unrelated disconnected foreground from each repair reference. The original expanded dispute region remains available as `context.png`; the clean subject montage is `source.png`.
 
 ## Conflict groups and repair packets

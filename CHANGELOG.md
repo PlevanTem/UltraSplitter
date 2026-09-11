@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Promoted compact card contact sheets from a README-only renderer to the product delivery path, with near-square layouts, uniform canvases, longest-edge subject normalization, safe background trimming, and manifest layout metadata.
 - Updated the edge-clipped real-world example after an approved three-subject reconstruction: the first generated grid failed safe-margin checks and the second passed deterministic and visual evaluation.
 - Replaced the synthetic README example with a real tested four-panel input, its actual contact sheet, and individually accessible source-faithful outputs.
 - Added a complete Simplified Chinese README with bidirectional language navigation.

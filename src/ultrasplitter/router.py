@@ -345,9 +345,13 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
             }
         )
     triage_preview_items.extend(ignored_preview_items)
-    make_contact_sheet(triage_preview_items, triage_sheet)
-    make_contact_sheet(deliverable_items, Path(manifest["delivery"]["contact_sheet"]))
+    triage_sheet_layout = make_contact_sheet(triage_preview_items, triage_sheet)
+    contact_sheet_layout = make_contact_sheet(
+        deliverable_items, Path(manifest["delivery"]["contact_sheet"])
+    )
     manifest["delivery"]["triage_sheet"] = str(triage_sheet.resolve())
+    manifest["delivery"]["triage_sheet_layout"] = triage_sheet_layout
+    manifest["delivery"]["contact_sheet_layout"] = contact_sheet_layout
     manifest["delivery"]["pending_repair_images"] = [
         item.get("review_image_path", item["image_path"])
         for item in generation_items

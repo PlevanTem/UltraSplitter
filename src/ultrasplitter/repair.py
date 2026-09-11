@@ -261,7 +261,9 @@ def ingest_repair(manifest_path: Path, group_id: str, grid_path: Path) -> dict[s
         if item.get("route") == "generated_reconstruction" and not item.get("deliverable")
     ]
     manifest["deliverable_count"] = len(deliverable_items)
-    make_contact_sheet(deliverable_items, Path(manifest["delivery"]["contact_sheet"]))
+    manifest["delivery"]["contact_sheet_layout"] = make_contact_sheet(
+        deliverable_items, Path(manifest["delivery"]["contact_sheet"])
+    )
     write_json(manifest_path, manifest)
     manifest = evaluate_manifest(manifest_path)
     return {"status": manifest["status"], "evaluation": evaluation, "delivery": manifest["delivery"]}

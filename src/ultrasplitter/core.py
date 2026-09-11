@@ -28,6 +28,7 @@ from typing import Any, Iterable
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 from .contracts import MIN_REPAIR_VISIBLE_FRACTION
+from .presentation import render_contact_sheet
 
 
 SCHEMA_VERSION = 3
@@ -632,31 +633,9 @@ def edge_dark_fraction(image: Image.Image, side: str, threshold: int = 100) -> f
     return sum(value <= threshold for value in values) / max(1, len(values))
 
 
-def make_contact_sheet(items: list[dict[str, Any]], output_path: Path) -> None:
-    if not items:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        canvas = Image.new("RGB", (600, 160), "#ececec")
-        draw = ImageDraw.Draw(canvas)
-        draw.text((24, 68), "No deliverable assets yet", fill="#555555", font=readable_font(18))
-        canvas.save(output_path, format="PNG", optimize=True)
-        return
-    columns = min(4, len(items))
-    rows = math.ceil(len(items) / columns)
-    cell_width, cell_height, label_height = 300, 320, 24
-    canvas = Image.new("RGB", (columns * cell_width, rows * cell_height), "#ececec")
-    draw = ImageDraw.Draw(canvas)
-    font = readable_font(15)
-    for index, item in enumerate(items):
-        with Image.open(item["image_path"]) as opened:
-            thumbnail = opened.convert("RGBA")
-            thumbnail.thumbnail((cell_width - 20, cell_height - label_height - 20), Image.Resampling.LANCZOS)
-            x = index % columns * cell_width + (cell_width - thumbnail.width) // 2
-            y = index // columns * cell_height + label_height + (cell_height - label_height - thumbnail.height) // 2
-            tile = Image.new("RGBA", thumbnail.size, "white")
-            tile.alpha_composite(thumbnail)
-            canvas.paste(tile.convert("RGB"), (x, y))
-        draw.text((index % columns * cell_width + 8, index // columns * cell_height + 6), item["label"], fill="black", font=font)
-    canvas.save(output_path, format="PNG", optimize=True)
+def make_contact_sheet(items: list[dict[str, Any]], output_path: Path) -> dict[str, Any]:
+    """Render the production compact-card preview while preserving source files."""
+    return render_contact_sheet(items, output_path)
 
 
 def apply_plan(
@@ -899,7 +878,7 @@ def apply_plan(
         global_warnings.append("candidate_set_requires_visual_review")
 
     contact_path = review_dir / "contact-sheet.png"
-    make_contact_sheet(output_items, contact_path)
+    contact_sheet_layout = make_contact_sheet(output_items, contact_path)
     review_required = bool(global_warnings)
     delivery = {
         "output_dir": str(output_dir.resolve()),
@@ -907,6 +886,7 @@ def apply_plan(
         "alpha_images": [item["rgba_path"] for item in output_items if item["rgba_path"]],
         "masks": [item["mask_path"] for item in output_items if item["mask_path"]],
         "contact_sheet": str(contact_path.resolve()),
+        "contact_sheet_layout": contact_sheet_layout,
         "manifest": str(manifest_path.resolve()),
     }
     manifest = {

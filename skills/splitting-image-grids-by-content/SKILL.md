@@ -22,7 +22,7 @@ Prefer an existing `ultrasplit` command. In an UltraSplitter checkout, use `scri
 7. If status is `awaiting_user_approval`, run `ultrasplit repair prepare`; show deliverable, repair, and ignored counts, every clean repair preview plus original context, reason, target count, call count, and two-attempt limit, then wait for explicit approval.
 8. After approval, record it with `ultrasplit repair approve`. Generate one regular grid per conflict group, not one image per subject, and ingest it.
 9. Compare reconstructed subjects against visible identity anchors and submit `pass`, `retryable`, or `identity_uncertain`. Never retry a group more than twice.
-10. Deliver the status, deliverable/repair/ignored counts, absolute output directory, contact sheet, manifest, and accessible image paths.
+10. Deliver the status, deliverable/repair/ignored counts, absolute output directory, compact contact sheet, manifest, and accessible image paths. The contact sheet is a presentation artifact: it uses a near-square card grid, a uniform background, and longest-edge subject normalization, while the individual delivered files remain unchanged.
 
 Generated completion is inferred content. Always identify it as reconstruction, never extraction or factual recovery.
 

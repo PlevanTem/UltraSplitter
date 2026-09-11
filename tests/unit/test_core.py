@@ -60,6 +60,11 @@ class CoreTests(unittest.TestCase):
             self.assertEqual(manifest["actual_count"], 3)
             self.assertEqual(manifest["status"], "success")
             self.assertTrue(all(Path(path).is_absolute() for path in manifest["delivery"]["images"]))
+            self.assertEqual(manifest["delivery"]["contact_sheet_layout"]["style"], "compact_cards_v1")
+            self.assertEqual(
+                manifest["delivery"]["contact_sheet_layout"]["subject_scale"],
+                "longest_edge_normalized",
+            )
 
     def test_scan_is_schema_v3_json(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
