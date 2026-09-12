@@ -62,6 +62,11 @@ Real inputs processed by the current workflow. Result previews use automatic car
       <td align="center"><a href="docs/assets/case-clipped-input.png"><img src="docs/assets/case-clipped-input-preview.png" alt="Edge-clipped subject collage input" width="470"></a></td>
       <td align="center"><a href="docs/assets/case-clipped-output.png"><img src="docs/assets/case-clipped-output-preview.png" alt="Five compact result cards after approved reconstruction" width="470"></a></td>
     </tr>
+    <tr>
+      <td><strong>Mixed semantic layouts</strong><br><code>success</code> · 4 subjects + 4 transparent variants<br><sub>Scope aligned first: the hero owns the giant hand, while the three lower turnarounds remain separate. One approved reconstruction grid, followed by independent three-background alpha review.</sub></td>
+      <td align="center"><a href="docs/assets/case-idol-input.png"><img src="docs/assets/case-idol-input-preview.png" alt="Character sheet mixing a hero composition with three turnaround views" width="470"></a></td>
+      <td align="center"><a href="docs/assets/case-idol-output.png"><img src="docs/assets/case-idol-output-preview.png" alt="Four transparent character assets reviewed on a checkerboard background" width="470"></a></td>
+    </tr>
   </tbody>
 </table>
 

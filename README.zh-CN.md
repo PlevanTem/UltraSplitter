@@ -62,6 +62,11 @@ UltraSplitter 不让视觉模型猜最终裁剪坐标。多模态宿主负责判
       <td align="center"><a href="docs/assets/case-clipped-input.png"><img src="docs/assets/case-clipped-input-preview.png" alt="主体被画面边缘截断的输入" width="470"></a></td>
       <td align="center"><a href="docs/assets/case-clipped-output.png"><img src="docs/assets/case-clipped-output-preview.png" alt="审批补全后紧凑排版的 5 个主体" width="470"></a></td>
     </tr>
+    <tr>
+      <td><strong>混合语义版式</strong><br><code>success</code> · 4 个主体 + 4 个透明变体<br><sub>先对齐范围：顶部角色与巨手归为一个主体，底部 3 个转面保持独立。一次审批后重建宫格，再通过独立的三背景透明版审阅。</sub></td>
+      <td align="center"><a href="docs/assets/case-idol-input.png"><img src="docs/assets/case-idol-input-preview.png" alt="混合英雄构图与三个角色转面的设定图" width="470"></a></td>
+      <td align="center"><a href="docs/assets/case-idol-output.png"><img src="docs/assets/case-idol-output-preview.png" alt="在棋盘格背景审阅的 4 个透明角色资产" width="470"></a></td>
+    </tr>
   </tbody>
 </table>
 
