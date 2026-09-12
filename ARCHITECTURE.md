@@ -16,7 +16,9 @@ Panel candidates come from continuous divider/frame evidence. Object candidates 
 
 ### Plan
 
-The host chooses a candidate set and groups stable region IDs into semantic items. Every clipped, contaminated, touching, or ambiguous candidate requires a `visual_assessment`. The host classifies it as `deliver`, `clean`, `repair`, or `ignore` and records visible completeness, whether the primary content remains recognizable, missing critical parts, identity confidence, and a visible-fraction estimate.
+The host treats deterministic candidates as planning evidence rather than the final inventory. It inspects the source and previews, inventories intended subjects and layout zones, then chooses a candidate set and groups stable region IDs into semantic items. Mixed layout systems, complex foreground/background overlap, multi-subject candidates, or materially ambiguous counts require scope alignment with the user before apply. If candidate IDs cannot express the confirmed scope, the host changes one justified scan assumption or exits explicitly instead of guessing coordinates.
+
+Every clipped, contaminated, touching, or ambiguous candidate requires a `visual_assessment`. The host classifies it as `deliver`, `clean`, `repair`, or `ignore` and records visible completeness, whether the primary content remains recognizable, missing critical parts, identity confidence, and a visible-fraction estimate. The host should semantically reject text, captions, and watermarks, but recognition does not create a pixel mask: inseparable text/subject regions still require a source-pixel cleaning route, a better candidate set, or an unsupported result.
 
 Generated repair requires all three gates: at least `0.65` of the subject is visibly retained, the primary content remains recognizable, and identity confidence is above `low`. A recognizable majority cannot be silently ignored; it is offered for approval-gated repair. Explicit user rejection may be recorded with `user_declined_repair: true`. Severely incomplete or identity-ambiguous fragments belong in `exclude_regions` plus structured `exclusions`; they are not output items and never become repair requests. Visible area alone is insufficient: missing identity-defining structure outweighs a large remaining pixel area.
 
@@ -34,13 +36,20 @@ An edge-contact flag without semantic assessment is not enough to authorize repa
 
 ## Triage and delivery separation
 
-The manifest separates three audiences:
+The manifest separates four artifact roles:
 
-- `delivery.images` and `review/contact-sheet.png` contain only currently deliverable source or reconstructed assets;
+- `delivery.images` contains only title-free production assets;
+- `delivery.transparent_candidates` contains unapproved alpha variants and the legacy `alpha_images` field aliases those paths;
+- `delivery.transparent_images` contains only alpha variants that passed automatic checks and an explicit independent visual verdict;
+- `review/contact-sheet.png` is the named, automatically arranged delivery preview, not an alternate production asset;
 - `review/triage-sheet.png` labels every retained candidate as `deliver`, `repair`, or `triage`, and shows structured exclusions as `ignore`;
 - `delivery.pending_repair_images` and `delivery.ignored_images` remain review evidence and never masquerade as finished assets.
 
-Contact sheets are production presentation artifacts, not alternate asset files. They use a compact near-square card grid, a uniform canvas, label-safe cells, and longest-edge subject normalization so mixed aspect ratios remain readable. Uniform-background trimming is applied only when corner and border evidence agree; otherwise the full image is preserved. The renderer never rewrites `delivery.images`. Layout metadata is recorded under `delivery.contact_sheet_layout` and `delivery.triage_sheet_layout`.
+Contact sheets are review presentation artifacts, not alternate asset files. They use a compact near-square card grid, a uniform canvas, label-safe cells, and longest-edge subject normalization so mixed aspect ratios remain readable. Uniform-background trimming is applied only when corner and border evidence agree; otherwise the full image is preserved. The renderer never rewrites `delivery.images`. Layout metadata is recorded under `delivery.contact_sheet_layout` and `delivery.triage_sheet_layout`.
+
+All routes converge on a primary delivery review gate. The host compares the confirmed inventory with the contact sheet and every individual delivery image. A failed candidate choice or plan returns to scan/plan with one named change; generated repair returns through ingest and the same review gate. Primary success requires both resolved manifest state and a visual `pass`. Repeated attempts are bounded by the failed cause rather than allowed to loop indefinitely.
+
+Transparent candidates use a separate, optional gate after the primary asset passes. Before review, the runtime may add transparent-only canvas padding to reach the safe margin without resampling or changing subject pixels. The renderer presents every candidate on white, black, and checkerboard sheets. Automatic checks require a real alpha channel, transparent background, non-empty foreground, and at least `0.08` safe margin; interior transparency is surfaced for visual review because holes may be either legitimate geometry or erased light material. A transparent `pass` promotes paths into `delivery.transparent_images`. `retryable` or `reject` keeps them out without invalidating an already accepted primary asset.
 
 Before a repair packet is prepared, simple-mask isolation removes unrelated disconnected foreground from each repair reference. The original expanded dispute region remains available as `context.png`; the clean subject montage is `source.png`.
 

@@ -49,6 +49,88 @@ def apply_repair_eligible(source: Path, root: Path) -> tuple[dict, Path]:
 
 
 class RouteAndRepairTests(unittest.TestCase):
+    def test_transparent_variant_has_an_independent_review_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "simple.png"
+            image = Image.new("RGB", (300, 300), "white")
+            ImageDraw.Draw(image).ellipse((100, 80, 200, 220), fill="orange")
+            image.save(source)
+            scan = core.scan_image(
+                source, root / "scan", "objects", None, 32, 0.0005, 1000, False
+            )
+            candidate = scan["scan"]["candidate_sets"][0]
+            plan = {
+                "schema_version": 3,
+                "mode": "objects",
+                "candidate_set": candidate["id"],
+                "expected_count": 1,
+                "padding": 0.15,
+                "emit": "all",
+                "items": [
+                    {
+                        "id": "item-001",
+                        "label": "orange",
+                        "regions": [candidate["regions"][0]["id"]],
+                    }
+                ],
+            }
+            result = core.apply_plan(source, scan["scan_path"], plan, root / "result", False)
+            manifest_path = result["manifest_path"]
+            manifest = route_manifest(manifest_path)
+
+            self.assertEqual(len(manifest["delivery"]["transparent_candidates"]), 1)
+            self.assertEqual(manifest["delivery"]["transparent_images"], [])
+            self.assertTrue(manifest["evaluation"]["transparent"]["automatic"]["passed"])
+            self.assertEqual(
+                set(manifest["delivery"]["transparent_review_sheets"]),
+                {"white", "black", "checkerboard"},
+            )
+
+            too_early = evaluate_manifest(manifest_path, transparent_verdict="pass")
+            self.assertEqual(too_early["status"], "needs_review")
+            self.assertEqual(
+                too_early["evaluation"]["transparent"]["status"],
+                "needs_primary_review",
+            )
+            self.assertEqual(too_early["delivery"]["transparent_images"], [])
+
+            main_pass = evaluate_manifest(manifest_path, "pass")
+            self.assertEqual(main_pass["status"], "success")
+            self.assertEqual(main_pass["delivery"]["transparent_images"], [])
+
+            transparent_pass = evaluate_manifest(manifest_path, transparent_verdict="pass")
+            self.assertEqual(transparent_pass["status"], "success")
+            self.assertEqual(
+                transparent_pass["delivery"]["transparent_images"],
+                transparent_pass["delivery"]["transparent_candidates"],
+            )
+            self.assertIsNotNone(transparent_pass["items"][0]["variants"]["transparent"])
+
+            rejected = evaluate_manifest(manifest_path, transparent_verdict="reject")
+            self.assertEqual(rejected["status"], "success")
+            self.assertEqual(rejected["delivery"]["transparent_images"], [])
+            self.assertFalse(rejected["delivery"]["transparent_review_required"])
+
+    def test_source_delivery_requires_explicit_visual_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "simple.png"
+            image = Image.new("RGB", (220, 160), "white")
+            ImageDraw.Draw(image).ellipse((60, 30, 155, 135), fill="orange")
+            image.save(source)
+            manifest, manifest_path = apply_auto(source, root)
+
+            self.assertEqual(manifest["status"], "needs_review")
+            self.assertEqual(manifest["evaluation"]["visual"], "not_run")
+
+            still_pending = evaluate_manifest(manifest_path)
+            self.assertEqual(still_pending["status"], "needs_review")
+
+            accepted = evaluate_manifest(manifest_path, "pass")
+            self.assertEqual(accepted["status"], "success")
+            self.assertFalse(accepted["review_required"])
+
     def test_overlapping_boxes_with_disjoint_foreground_use_source_composite(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -340,6 +422,16 @@ class RouteAndRepairTests(unittest.TestCase):
             ingested = ingest_repair(manifest_path, "conflict-001", grid)
             self.assertEqual(ingested["status"], "needs_review")
             self.assertEqual(ingested["delivery"]["pending_repair_images"], [])
+            reloaded = core.read_json(manifest_path)
+            reconstructed_alpha = Path(reloaded["items"][0]["rgba_path"])
+            self.assertIn("alpha", reconstructed_alpha.parts)
+            self.assertIn("reconstructed", reconstructed_alpha.parts)
+            self.assertTrue(
+                all(
+                    "transparent-candidates" in Path(path).parts
+                    for path in ingested["delivery"]["transparent_candidates"]
+                )
+            )
             self.assertEqual(
                 ingested["delivery"]["contact_sheet_layout"]["style"],
                 "compact_cards_v1",

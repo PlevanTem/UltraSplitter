@@ -10,8 +10,9 @@ from typing import Any
 from PIL import Image, ImageDraw
 
 from .contracts import MAX_REPAIR_ATTEMPTS, load_json, require_v3, write_json
-from .core import load_image, make_contact_sheet, readable_font
+from .core import alpha_outputs, estimate_background, load_image, make_contact_sheet, readable_font
 from .evaluator import evaluate_grid, evaluate_manifest
+from .transparency import sync_transparent_delivery
 
 
 def _expanded_crop(box: list[int], width: int, height: int, fraction: float = 0.08) -> list[int]:
@@ -230,7 +231,11 @@ def ingest_repair(manifest_path: Path, group_id: str, grid_path: Path) -> dict[s
 
     rows, columns = group["layout"]["rows"], group["layout"]["columns"]
     reconstructed = manifest_path.parent / "images" / "reconstructed"
+    reconstructed_alpha = manifest_path.parent / "alpha" / "reconstructed"
+    reconstructed_masks = manifest_path.parent / "masks" / "reconstructed"
     reconstructed.mkdir(parents=True, exist_ok=True)
+    reconstructed_alpha.mkdir(parents=True, exist_ok=True)
+    reconstructed_masks.mkdir(parents=True, exist_ok=True)
     item_map = {item["id"]: item for item in manifest["items"]}
     for index, item_id in enumerate(group["item_ids"]):
         row, column = divmod(index, columns)
@@ -242,7 +247,19 @@ def ingest_repair(manifest_path: Path, group_id: str, grid_path: Path) -> dict[s
         )
         filename = Path(item_map[item_id]["image_path"]).name
         target = reconstructed / filename
-        grid.crop(box).save(target, format="PNG", optimize=True)
+        crop = grid.crop(box)
+        crop.save(target, format="PNG", optimize=True)
+        background, uniformity = estimate_background(crop, 32)
+        item_map[item_id]["rgba_path"] = None
+        item_map[item_id]["mask_path"] = None
+        if background[3] <= 16 or uniformity >= 0.8:
+            rgba, mask = alpha_outputs(crop, background, 32)
+            rgba_path = reconstructed_alpha / filename
+            mask_path = reconstructed_masks / filename
+            rgba.save(rgba_path, format="PNG", optimize=True)
+            mask.save(mask_path, format="PNG", optimize=True)
+            item_map[item_id]["rgba_path"] = str(rgba_path.resolve())
+            item_map[item_id]["mask_path"] = str(mask_path.resolve())
         item_map[item_id]["original_source_path"] = item_map[item_id]["image_path"]
         item_map[item_id]["image_path"] = str(target.resolve())
         item_map[item_id]["deliverable"] = True
@@ -252,9 +269,6 @@ def ingest_repair(manifest_path: Path, group_id: str, grid_path: Path) -> dict[s
     group["state"] = "ingested"
     deliverable_items = [item for item in manifest["items"] if item.get("deliverable")]
     manifest["delivery"]["images"] = [item["image_path"] for item in deliverable_items]
-    manifest["delivery"]["alpha_images"] = [
-        item["rgba_path"] for item in deliverable_items if item.get("rgba_path")
-    ]
     manifest["delivery"]["pending_repair_images"] = [
         item.get("review_image_path", item["image_path"])
         for item in manifest["items"]
@@ -264,6 +278,7 @@ def ingest_repair(manifest_path: Path, group_id: str, grid_path: Path) -> dict[s
     manifest["delivery"]["contact_sheet_layout"] = make_contact_sheet(
         deliverable_items, Path(manifest["delivery"]["contact_sheet"])
     )
+    sync_transparent_delivery(manifest, manifest_path)
     write_json(manifest_path, manifest)
     manifest = evaluate_manifest(manifest_path)
     return {"status": manifest["status"], "evaluation": evaluation, "delivery": manifest["delivery"]}

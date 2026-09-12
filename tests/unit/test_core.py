@@ -58,7 +58,9 @@ class CoreTests(unittest.TestCase):
             result = core.apply_plan(source, scan_result["scan_path"], plan, root / "result", False)
             manifest = route_manifest(result["manifest_path"])
             self.assertEqual(manifest["actual_count"], 3)
-            self.assertEqual(manifest["status"], "success")
+            self.assertEqual(manifest["status"], "needs_review")
+            self.assertTrue(manifest["review_required"])
+            self.assertEqual(manifest["evaluation"]["visual"], "not_run")
             self.assertTrue(all(Path(path).is_absolute() for path in manifest["delivery"]["images"]))
             self.assertEqual(manifest["delivery"]["contact_sheet_layout"]["style"], "compact_cards_v1")
             self.assertEqual(

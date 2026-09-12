@@ -51,7 +51,7 @@ Plans select exact scan candidate IDs and may attach visible semantic evidence:
 - `candidate_set` and `regions` must use exact IDs from `scan.json`.
 - `expected_count` equals `items.length`.
 - `padding` defaults to `0` for panels and `0.03` for objects.
-- `emit` is `auto`, `crop`, `rgba`, or `all`.
+- `emit` is `auto`, `crop`, `rgba`, or `all`. `rgba` and `all` create transparent candidates, not automatically approved transparent deliverables. `auto` may create candidates for uniform object backgrounds. Use enough plan padding to meet the `0.08` transparent safe-margin floor.
 - `visual_assessment` is required for clipped, contaminated, touching, or ambiguous candidates. `recommended_action` is `deliver`, `clean`, or `repair`; `missing_severity` is `none`, `minor`, or `repairable` for retained items.
 - A repair item requires `visible_fraction_estimate >= 0.65`, `primary_content_recognizable: true`, and identity confidence above `low`. The fraction is a gate, not an automatic semantic decision: missing identity-defining structure can still make a large fragment unsuitable for reconstruction.
 - A recognizable candidate at or above 0.65 must be offered for repair rather than silently ignored. It may be excluded only after explicit rejection, recorded as `user_declined_repair: true`.

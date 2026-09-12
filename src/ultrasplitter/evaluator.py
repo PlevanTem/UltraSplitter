@@ -9,6 +9,7 @@ from PIL import Image, ImageStat
 
 from .core import estimate_background, foreground_mask
 from .contracts import MAX_REPAIR_ATTEMPTS, load_json, require_v3, write_json
+from .transparency import apply_transparent_verdict
 
 
 def _shape_signature(mask: Image.Image) -> bytes:
@@ -110,7 +111,11 @@ def evaluate_grid(path: Path, layout: dict[str, int]) -> dict[str, Any]:
     }
 
 
-def evaluate_manifest(manifest_path: Path, visual_verdict: str | None = None) -> dict[str, Any]:
+def evaluate_manifest(
+    manifest_path: Path,
+    visual_verdict: str | None = None,
+    transparent_verdict: str | None = None,
+) -> dict[str, Any]:
     manifest = load_json(manifest_path)
     require_v3(manifest)
     if visual_verdict not in {None, "pass", "retryable", "identity_uncertain"}:
@@ -137,9 +142,10 @@ def evaluate_manifest(manifest_path: Path, visual_verdict: str | None = None) ->
         for item in manifest.get("items", [])
         if item.get("route") == "generated_reconstruction" and not item.get("deliverable")
     ]
-    manifest.setdefault("evaluation", {})["visual"] = visual_verdict or manifest["evaluation"].get(
+    effective_visual_verdict = visual_verdict or manifest.setdefault("evaluation", {}).get(
         "visual", "not_run"
     )
+    manifest["evaluation"]["visual"] = effective_visual_verdict
     if untriaged:
         manifest["status"] = "needs_user_decision"
     elif pending and manifest.get("approval", {}).get("state") != "approved":
@@ -151,14 +157,15 @@ def evaluate_manifest(manifest_path: Path, visual_verdict: str | None = None) ->
         for group in groups
     ):
         manifest["status"] = "retry_exhausted"
-    elif visual_verdict == "identity_uncertain":
+    elif effective_visual_verdict == "identity_uncertain":
         manifest["status"] = "needs_user_decision"
-    elif visual_verdict == "retryable" or hard_failures or pending:
+    elif effective_visual_verdict == "retryable" or hard_failures or pending:
         manifest["status"] = "needs_review"
-    elif groups and visual_verdict != "pass":
+    elif effective_visual_verdict != "pass":
         manifest["status"] = "needs_review"
     else:
         manifest["status"] = "success"
     manifest["review_required"] = manifest["status"] != "success"
+    apply_transparent_verdict(manifest, transparent_verdict)
     write_json(manifest_path, manifest)
     return manifest

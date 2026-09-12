@@ -6,7 +6,12 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from ultrasplitter.presentation import choose_grid, isolate_subject, render_contact_sheet
+from ultrasplitter.presentation import (
+    choose_grid,
+    isolate_subject,
+    render_contact_sheet,
+    render_transparency_review_sheet,
+)
 
 
 class PresentationTests(unittest.TestCase):
@@ -74,6 +79,21 @@ class PresentationTests(unittest.TestCase):
             self.assertEqual(metadata["count"], 0)
             self.assertEqual(metadata["canvas"], [640, 180])
             self.assertTrue(output.is_file())
+
+    def test_transparency_review_renders_all_contrast_backgrounds(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            asset = root / "transparent.png"
+            image = Image.new("RGBA", (180, 180), (0, 0, 0, 0))
+            ImageDraw.Draw(image).ellipse((45, 35, 135, 145), fill="#f2f2f2")
+            image.save(asset)
+            items = [{"label": "silver subject", "image_path": str(asset)}]
+            for style in ("white", "black", "checkerboard"):
+                output = root / f"{style}.png"
+                metadata = render_transparency_review_sheet(items, output, style)
+                self.assertEqual(metadata["background"], style)
+                self.assertEqual(metadata["count"], 1)
+                self.assertTrue(output.is_file())
 
 
 if __name__ == "__main__":

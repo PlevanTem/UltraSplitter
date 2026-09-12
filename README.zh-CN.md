@@ -31,7 +31,7 @@ UltraSplitter 不让视觉模型猜最终裁剪坐标。多模态宿主负责判
 - **优先保留原图像素**——完整素材直接裁切；检测框重叠但轮廓可分时，通过前景掩码清理和重排解决，不重新生成。
 - **需要 AIGC 补全时先审批**——可识别但被截断、遮挡的主体会合并成一次高效宫格任务；调用生成模型前，先向用户展示范围与成本。
 - **有界质量循环**——检查数量、重复、背景、分辨率、触边、留白和可见身份特征；每个冲突组最多尝试两次，不无限生成。
-- **直接交付生产资产**——在 `output/` 和 `manifest.json` 中提供命名图片、紧凑联系表、来源、状态、评估证据和绝对访问路径。
+- **直接交付生产资产**——在 `output/` 和 `manifest.json` 中提供命名主资产、独立审阅后的可选透明变体、紧凑审阅图、来源、状态、评估证据和绝对访问路径。
 - **AI 原生调用**——可为 Codex、Claude Code 等兼容 Agent 安装 Skill，也可直接使用 Python CLI。
 
 ## Showcases
@@ -72,7 +72,7 @@ UltraSplitter 不让视觉模型猜最终裁剪坐标。多模态宿主负责判
 直接从仓库中的单个 Skill 路径安装：
 
 ```bash
-npx skills@latest add https://github.com/PlevanTem/UltraSplitter/tree/main/skills/splitting-image-grids-by-content
+npx skills@latest add https://github.com/PlevanTem/UltraSplitter/tree/main/.agents/skills/splitting-image-grids-by-content
 ```
 
 之后用自然语言告诉 Agent：
@@ -82,7 +82,7 @@ npx skills@latest add https://github.com/PlevanTem/UltraSplitter/tree/main/skill
 交付所有可用主体；遇到需要生成式补全的截断主体，先向我确认。
 ```
 
-Skill 会优先复用已有的 `ultrasplit` 运行时；若缺少运行时，会从本仓库安装 Python 包。
+Skill 会优先复用已有的 `ultrasplit` CLI 运行时；若缺少运行时，会从本仓库加载 Python 包。运行时只负责确定性的扫描、执行、路由和清单操作；语义资产盘点、范围对齐和视觉审阅仍由宿主模型负责。
 
 ### 2. 安装并运行 CLI
 
@@ -90,8 +90,14 @@ Skill 会优先复用已有的 `ultrasplit` 运行时；若缺少运行时，会
 git clone https://github.com/PlevanTem/UltraSplitter.git
 cd UltraSplitter
 python -m pip install -e .
-ultrasplit run input.png --name character-views
+ultrasplit run input.png --output-dir output/character-views
+# 审阅联系表和每张交付图片后，再记录视觉结论：
+ultrasplit evaluate output/character-views/manifest.json --visual-verdict pass
+# 透明候选必须经过白底、黑底和棋盘格审阅后才能提升为交付件：
+ultrasplit evaluate output/character-views/manifest.json --transparent-verdict pass
 ```
+
+`ultrasplit run` 只是面向简单输入的确定性快捷命令，不能替代 Skill 中由模型完成的资产盘点和范围对齐；在显式视觉通过前，输出保持 `needs_review`。
 
 <details>
 <summary>显式执行扫描、规划、修复与评估</summary>
@@ -123,7 +129,8 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 - 支持带边框的分栏图，以及透明或近似纯色背景中空间分离的主体。
 - 不执行复杂的语义实例分割。
 - 生成式补全属于重建内容，不是对缺失原始像素的恢复。
-- 对密集、透明、相互接触或被画面截断的情况，返回明确的复核或批准状态，不静默宣称成功。
+- 所有交付路径都必须显式视觉通过；高密度、透明、相互接触或被画面截断的情况还可能需要范围对齐、语义分诊或修复审批。
+- 透明候选不会自动成为交付件。只有独立审阅通过的路径才进入 `delivery.transparent_images`；透明变体失败或被拒绝不影响已经通过的主资产。
 
 ## 路线图
 

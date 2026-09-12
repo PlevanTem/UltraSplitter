@@ -879,7 +879,9 @@ def apply_plan(
 
     contact_path = review_dir / "contact-sheet.png"
     contact_sheet_layout = make_contact_sheet(output_items, contact_path)
-    review_required = bool(global_warnings)
+    # Applying a plan only proves that the requested source pixels were emitted.
+    # Every delivery still requires an explicit multimodal visual verdict.
+    review_required = True
     delivery = {
         "output_dir": str(output_dir.resolve()),
         "images": [item["image_path"] for item in output_items],
@@ -891,7 +893,7 @@ def apply_plan(
     }
     manifest = {
         "schema_version": SCHEMA_VERSION,
-        "status": "needs_review" if review_required else "success",
+        "status": "needs_review",
         "review_required": review_required,
         "source": scan["source"],
         "scan_path": str(scan_path.resolve()),

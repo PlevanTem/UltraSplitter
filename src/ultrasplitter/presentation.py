@@ -208,3 +208,83 @@ def render_contact_sheet(
         "style": "compact_cards_v1",
         "subject_scale": "longest_edge_normalized",
     }
+
+
+def _transparency_background(size: tuple[int, int], style: str) -> Image.Image:
+    if style == "white":
+        return Image.new("RGB", size, "white")
+    if style == "black":
+        return Image.new("RGB", size, "black")
+    if style != "checkerboard":
+        raise ValueError("transparency preview background must be white, black, or checkerboard")
+    surface = Image.new("RGB", size, "#eeeeee")
+    draw = ImageDraw.Draw(surface)
+    step = 20
+    for top in range(0, size[1], step):
+        for left in range(0, size[0], step):
+            if (left // step + top // step) % 2:
+                draw.rectangle((left, top, left + step - 1, top + step - 1), fill="#bdbdbd")
+    return surface
+
+
+def render_transparency_review_sheet(
+    items: list[dict[str, Any]], output_path: Path, background_style: str
+) -> dict[str, Any]:
+    """Render transparent candidates on a named contrast background for visual QA."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows, columns = choose_grid(len(items))
+    if not items:
+        return render_contact_sheet([], output_path, empty_message="No transparent candidates")
+
+    outer, gap = DEFAULT_OUTER_MARGIN, DEFAULT_GAP
+    card_width, card_height = DEFAULT_CARD_SIZE
+    width = outer * 2 + columns * card_width + (columns - 1) * gap
+    height = outer * 2 + rows * card_height + (rows - 1) * gap
+    canvas = Image.new("RGB", (width, height), CANVAS_BACKGROUND)
+    draw = ImageDraw.Draw(canvas)
+    label_height = max(44, round(card_height * 0.15))
+    label_font = _font(max(14, min(20, round(card_width / 18))), bold=True)
+
+    for index, item in enumerate(items):
+        row, column = divmod(index, columns)
+        left = outer + column * (card_width + gap)
+        top = outer + row * (card_height + gap)
+        right, bottom = left + card_width, top + card_height
+        radius = max(10, min(18, round(min(card_width, card_height) * 0.055)))
+        draw.rounded_rectangle((left + 3, top + 5, right + 3, bottom + 5), radius=radius, fill=CARD_SHADOW)
+        draw.rounded_rectangle((left, top, right, bottom), radius=radius, fill=CARD_BACKGROUND, outline=CARD_BORDER, width=2)
+        label = _fit_label(
+            draw,
+            str(item.get("label") or item.get("id") or f"asset-{index + 1:02d}"),
+            label_font,
+            card_width - 36,
+        )
+        label_box = draw.textbbox((0, 0), label, font=label_font)
+        label_y = top + max(10, (label_height - (label_box[3] - label_box[1])) // 2 - label_box[1])
+        draw.text((left + 18, label_y), label, fill=TEXT_COLOR, font=label_font)
+        divider_y = top + label_height
+        draw.line((left + 16, divider_y, right - 16, divider_y), fill=DIVIDER_COLOR, width=2)
+
+        preview_size = (card_width - 32, bottom - divider_y - 24)
+        preview = _transparency_background(preview_size, background_style).convert("RGBA")
+        with Image.open(Path(item["image_path"])) as opened:
+            subject = opened.convert("RGBA")
+        available = (max(1, round(preview.width * 0.82)), max(1, round(preview.height * 0.82)))
+        scale = min(available[0] / max(1, subject.width), available[1] / max(1, subject.height))
+        subject = subject.resize(
+            (max(1, round(subject.width * scale)), max(1, round(subject.height * scale))),
+            Image.Resampling.LANCZOS,
+        )
+        preview.alpha_composite(subject, ((preview.width - subject.width) // 2, (preview.height - subject.height) // 2))
+        canvas.paste(preview.convert("RGB"), (left + 16, divider_y + 12))
+
+    canvas.save(output_path, format="PNG", optimize=True)
+    return {
+        "rows": rows,
+        "columns": columns,
+        "count": len(items),
+        "canvas": [width, height],
+        "style": "transparent_review_cards_v1",
+        "background": background_style,
+        "subject_scale": "longest_edge_normalized",
+    }

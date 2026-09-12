@@ -31,7 +31,7 @@ Instead of asking a vision model to guess crop coordinates, UltraSplitter lets t
 - **Source-first output** — intact assets remain original-pixel crops. Separable overlaps use foreground masks and clean re-layout rather than regeneration.
 - **Approval-gated AIGC repair** — recognizable clipped or occluded subjects are grouped into one efficient repair grid. The user sees the scope before any generation call.
 - **Bounded quality loop** — generated grids are checked for count, duplicates, background, resolution, edge contact, safe margin, and visible identity; each group stops after at most two attempts.
-- **Production-ready delivery** — named images, a compact contact sheet, provenance, status, evaluation evidence, and absolute access paths are written to `output/` and `manifest.json`.
+- **Production-ready delivery** — named primary images, independently reviewed optional transparent variants, compact review sheets, provenance, status, evaluation evidence, and absolute access paths are written to `output/` and `manifest.json`.
 - **Agent-native operation** — install the Skill for Codex, Claude Code, or another compatible coding agent, or use the Python CLI directly.
 
 ## Showcases
@@ -72,7 +72,7 @@ Real inputs processed by the current workflow. Result previews use automatic car
 Install the single Skill directly from its repository path:
 
 ```bash
-npx skills@latest add https://github.com/PlevanTem/UltraSplitter/tree/main/skills/splitting-image-grids-by-content
+npx skills@latest add https://github.com/PlevanTem/UltraSplitter/tree/main/.agents/skills/splitting-image-grids-by-content
 ```
 
 Then ask your agent in ordinary language:
@@ -82,7 +82,7 @@ Use splitting-image-grids-by-content to split @generated-sheet.png.
 Deliver every usable subject and ask me before reconstructing clipped ones.
 ```
 
-The Skill reuses an installed `ultrasplit` runtime or installs the Python package from this repository when the runtime is missing.
+The Skill reuses an installed `ultrasplit` CLI runtime or loads the Python package from this repository when the runtime is missing. The runtime performs deterministic scan, apply, routing, and manifest operations; the host model still owns semantic inventory, scope alignment, and visual review.
 
 ### 2. Install and run the CLI
 
@@ -90,8 +90,14 @@ The Skill reuses an installed `ultrasplit` runtime or installs the Python packag
 git clone https://github.com/PlevanTem/UltraSplitter.git
 cd UltraSplitter
 python -m pip install -e .
-ultrasplit run input.png --name character-views
+ultrasplit run input.png --output-dir output/character-views
+# Inspect the contact sheet and every delivery image, then record the visual verdict:
+ultrasplit evaluate output/character-views/manifest.json --visual-verdict pass
+# Promote optional alpha candidates only after white, black, and checkerboard review:
+ultrasplit evaluate output/character-views/manifest.json --transparent-verdict pass
 ```
+
+`ultrasplit run` is a deterministic shortcut for simple inputs. It does not replace the Skill's model-guided inventory and scope-alignment workflow, and its output remains `needs_review` until an explicit visual pass.
 
 <details>
 <summary>Explicit scan, plan, repair, and evaluation commands</summary>
@@ -123,7 +129,8 @@ Every run writes a schema-v3 manifest with exact source coordinates, route evide
 - Supports framed panels and spatially separated objects on transparent or approximately uniform backgrounds.
 - Does not perform complex semantic instance segmentation.
 - Generated completion is reconstructed content, not recovered source truth.
-- Dense, transparent, touching, or clipped cases return an explicit review or approval state instead of silent success.
+- Every delivery route requires an explicit visual pass. Dense, transparent, touching, or clipped cases may additionally require scope alignment, semantic triage, or repair approval.
+- Transparent candidates are never automatic deliverables. Only independently reviewed paths appear in `delivery.transparent_images`; failed or rejected alpha variants do not invalidate approved primary assets.
 
 ## Roadmap
 

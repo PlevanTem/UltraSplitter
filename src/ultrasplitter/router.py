@@ -15,6 +15,7 @@ from .contracts import (
 )
 from .core import load_image, make_contact_sheet
 from .extractor import compose_source_item
+from .transparency import sync_transparent_delivery
 
 
 def _intersection(first: list[int], second: list[int]) -> int:
@@ -313,12 +314,12 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
     elif requested:
         manifest["status"] = "awaiting_user_approval"
         manifest["review_required"] = True
-    elif non_generation_warnings:
+    else:
+        # Routing and deterministic checks cannot certify semantic correctness.
+        # Source crops and composites must pass the same explicit visual gate as
+        # reconstructed assets before the manifest may become successful.
         manifest["status"] = "needs_review"
         manifest["review_required"] = True
-    else:
-        manifest["status"] = "success"
-        manifest["review_required"] = False
     manifest["evaluation"] = {
         "deterministic": "pass" if not non_generation_warnings else "review",
         "visual": "not_run",
@@ -360,5 +361,6 @@ def route_manifest(manifest_path: Path) -> dict[str, Any]:
     manifest["deliverable_count"] = len(deliverable_items)
     manifest["repair_candidate_count"] = len(generation_items)
     manifest["ignored_count"] = len(manifest.get("exclusions", []))
+    sync_transparent_delivery(manifest, manifest_path)
     write_json(manifest_path, manifest)
     return manifest

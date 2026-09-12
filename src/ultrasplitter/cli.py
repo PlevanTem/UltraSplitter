@@ -33,6 +33,7 @@ def _summary(manifest: dict[str, Any]) -> dict[str, Any]:
         },
         "conflict_groups": len(manifest.get("conflict_groups", [])),
         "warnings": manifest.get("warnings", []),
+        "transparent": manifest.get("evaluation", {}).get("transparent"),
         "delivery": manifest.get("delivery"),
     }
 
@@ -69,6 +70,7 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate = commands.add_parser("evaluate", help="evaluate a completed or repaired manifest")
     evaluate.add_argument("manifest", type=Path)
     evaluate.add_argument("--visual-verdict", choices=("pass", "retryable", "identity_uncertain"))
+    evaluate.add_argument("--transparent-verdict", choices=("pass", "retryable", "reject"))
 
     repair = commands.add_parser("repair", help="prepare or ingest provider-neutral generated repairs")
     repairs = repair.add_subparsers(dest="repair_command", required=True)
@@ -149,7 +151,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "inspect":
             payload = _summary(load_json(args.manifest))
         elif args.command == "evaluate":
-            payload = _summary(evaluate_manifest(args.manifest, args.visual_verdict))
+            payload = _summary(
+                evaluate_manifest(args.manifest, args.visual_verdict, args.transparent_verdict)
+            )
         elif args.repair_command == "prepare":
             payload = prepare_repair(args.manifest)
         elif args.repair_command == "approve":
