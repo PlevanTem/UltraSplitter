@@ -20,7 +20,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
-dependencies = ["Pillow>=10.0,<13"]
+dependencies = ["Pillow>=10.0,<13", "psd-tools>=1.11,<2"]
 
 [project.urls]
 Homepage = "https://github.com/PlevanTem/UltraSplitter"

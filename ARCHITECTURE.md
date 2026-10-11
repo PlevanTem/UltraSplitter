@@ -41,6 +41,7 @@ The manifest separates four artifact roles:
 - `delivery.images` contains only title-free production assets;
 - `delivery.transparent_candidates` contains unapproved alpha variants and the legacy `alpha_images` field aliases those paths;
 - `delivery.transparent_images` contains only alpha variants that passed automatic checks and an explicit independent visual verdict;
+- `delivery.layered_psd` points to the first Photoshop-compatible layered document generated only after the primary visual verdict passes. Assets are packed at native pixel dimensions into one PSD page when they fit within 30,000×30,000 pixels, or into numbered PSD pages when they do not; oversized individual assets are split into named pixel tiles with source coordinates recorded in `delivery.layered_psd_info`. No resampling is performed, and independently approved transparent variants are used when available;
 - `review/contact-sheet.png` is the named, automatically arranged delivery preview, not an alternate production asset;
 - `review/triage-sheet.png` labels every retained candidate as `deliver`, `repair`, or `triage`, and shows structured exclusions as `ignore`;
 - `delivery.pending_repair_images` and `delivery.ignored_images` remain review evidence and never masquerade as finished assets.
@@ -69,6 +70,8 @@ Generation candidates become nodes in a spatial conflict graph. Expanded source 
 Preparation never invokes a model. The manifest moves to `awaiting_user_approval`. `repair ingest` rejects a grid unless that exact group is recorded as approved.
 
 ## Evaluation and bounded loop
+
+For the evaluator entry points, review-state branches, and layered-PSD export gate, see the [Evaluator Pipeline](docs/evaluator-pipeline.md) (English) or [中文流程图](docs/evaluator-pipeline.zh-CN.md).
 
 Deterministic grid checks cover dimensions, expected occupied cells, uniform background, edge contact, minimum margin, and obvious duplicate cells. A multimodal host then compares every reconstructed subject with the visible source anchors: identity, pose, silhouette, color, material, ornament, and absence of redesign.
 

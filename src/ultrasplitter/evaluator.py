@@ -9,6 +9,7 @@ from PIL import Image, ImageStat
 
 from .core import estimate_background, foreground_mask
 from .contracts import MAX_REPAIR_ATTEMPTS, load_json, require_v3, write_json
+from .layered_psd import export_layered_psd
 from .transparency import apply_transparent_verdict
 
 
@@ -167,5 +168,23 @@ def evaluate_manifest(
         manifest["status"] = "success"
     manifest["review_required"] = manifest["status"] != "success"
     apply_transparent_verdict(manifest, transparent_verdict)
+    delivery = manifest.setdefault("delivery", {})
+    delivery["layered_psd"] = None
+    delivery["layered_psd_files"] = []
+    delivery["layered_psd_info"] = None
+    manifest.setdefault("evaluation", {})["layered_psd"] = "pending_primary_review"
+    if manifest["status"] == "success":
+        try:
+            psd_info = export_layered_psd(manifest, manifest_path.parent / "delivery" / "layers.psd")
+        except (OSError, ValueError) as exc:
+            manifest["status"] = "failed"
+            manifest["review_required"] = True
+            manifest.setdefault("warnings", []).append(f"layered_psd_export_failed:{exc}")
+            manifest.setdefault("evaluation", {})["layered_psd"] = "failed"
+        else:
+            delivery["layered_psd"] = psd_info["path"]
+            delivery["layered_psd_files"] = psd_info["paths"]
+            delivery["layered_psd_info"] = psd_info
+            manifest.setdefault("evaluation", {})["layered_psd"] = "pass"
     write_json(manifest_path, manifest)
     return manifest
