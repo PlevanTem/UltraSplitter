@@ -31,7 +31,7 @@ Instead of asking a vision model to guess crop coordinates, UltraSplitter lets t
 - **Source-first output** — intact assets remain original-pixel crops. Separable overlaps use foreground masks and clean re-layout rather than regeneration.
 - **Approval-gated AIGC repair** — recognizable clipped or occluded subjects are grouped into one efficient repair grid. The user sees the scope before any generation call.
 - **Bounded quality loop** — generated grids are checked for count, duplicates, background, resolution, edge contact, safe margin, and visible identity; each group stops after at most two attempts.
-- **Production-ready delivery** — named primary images, independently reviewed optional transparent variants, compact review sheets, provenance, status, evaluation evidence, and absolute access paths are written to `output/` and `manifest.json`.
+- **Production-ready delivery** — named primary images, independently reviewed optional transparent variants, a layered PSD after visual approval, compact review sheets, provenance, status, evaluation evidence, and absolute access paths are written to `output/` and `manifest.json`.
 - **Agent-native operation** — install the Skill for Codex, Claude Code, or another compatible coding agent, or use the Python CLI directly.
 
 ## Showcases
@@ -102,6 +102,8 @@ ultrasplit evaluate output/character-views/manifest.json --visual-verdict pass
 ultrasplit evaluate output/character-views/manifest.json --transparent-verdict pass
 ```
 
+After the primary visual review passes, UltraSplitter exports editable PSD layers at native pixel dimensions. It uses one `layers.psd` when assets fit within a 30,000×30,000 px canvas, and numbered PSD pages when they do not. An individual asset larger than the page limit is split into named pixel tiles with source coordinates recorded in the manifest. No resampling is performed. Independently approved transparent variants are used when available; otherwise the PSD uses the primary assets. Individual PNGs remain available as separate files.
+
 `ultrasplit run` is a deterministic shortcut for simple inputs. It does not replace the Skill's model-guided inventory and scope-alignment workflow, and its output remains `needs_review` until an explicit visual pass.
 
 <details>
@@ -128,6 +130,8 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 <img src="docs/assets/architecture.svg" alt="UltraSplitter agent-native processing architecture" width="100%">
 
 Every run writes a schema-v3 manifest with exact source coordinates, route evidence, provenance, approval state, bounded repair attempts, evaluation status, and absolute delivery paths. See [ARCHITECTURE.md](ARCHITECTURE.md).
+
+For the evaluation and layered-PSD export flow, see the [Evaluator Pipeline](docs/evaluator-pipeline.md).
 
 ## Current boundary
 

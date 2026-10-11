@@ -805,7 +805,11 @@ def apply_plan(
     manifest_path = output_dir / "manifest.json"
 
     ordinal_width = max(2, len(str(len(items_plan))))
-    planned_paths = [manifest_path, review_dir / "contact-sheet.png"]
+    planned_paths = [
+        manifest_path,
+        review_dir / "contact-sheet.png",
+        output_dir / "delivery" / "layers.psd",
+    ]
     output_names: list[str] = []
     for index, label in enumerate(labels, 1):
         output_name = f"{index:0{ordinal_width}d}-{label}.png"

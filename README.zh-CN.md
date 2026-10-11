@@ -31,7 +31,7 @@ UltraSplitter 不让视觉模型猜最终裁剪坐标。多模态宿主负责判
 - **优先保留原图像素**——完整素材直接裁切；检测框重叠但轮廓可分时，通过前景掩码清理和重排解决，不重新生成。
 - **需要 AIGC 补全时先审批**——可识别但被截断、遮挡的主体会合并成一次高效宫格任务；调用生成模型前，先向用户展示范围与成本。
 - **有界质量循环**——检查数量、重复、背景、分辨率、触边、留白和可见身份特征；每个冲突组最多尝试两次，不无限生成。
-- **直接交付生产资产**——在 `output/` 和 `manifest.json` 中提供命名主资产、独立审阅后的可选透明变体、紧凑审阅图、来源、状态、评估证据和绝对访问路径。
+- **直接交付生产资产**——在 `output/` 和 `manifest.json` 中提供命名主资产、独立审阅后的可选透明变体、审核通过后生成的分层 PSD、紧凑审阅图、来源、状态、评估证据和绝对访问路径。
 - **AI 原生调用**——可为 Codex、Claude Code 等兼容 Agent 安装 Skill，也可直接使用 Python CLI。
 
 ## Showcases
@@ -102,6 +102,8 @@ ultrasplit evaluate output/character-views/manifest.json --visual-verdict pass
 ultrasplit evaluate output/character-views/manifest.json --transparent-verdict pass
 ```
 
+主资产视觉审核通过后会生成分层 PSD。素材能装入 30,000×30,000 像素画布时，交付一个 `layers.psd`；装不下时自动分卷为 `layers.psd`、`layers-02.psd` 等文件，每份都保留独立图层。单个素材边长超过 30,000 像素时会按原像素切块，并在 manifest 中记录来源坐标。导出不缩放、不重采样；分卷避免因画布尺寸超过阈值直接失败。透明变体通过独立审核后，PSD 会使用透明版本；否则保留主资产像素。拆出的 PNG 仍会单独交付，分卷路径与图层来源记录在 manifest 中。
+
 `ultrasplit run` 只是面向简单输入的确定性快捷命令，不能替代 Skill 中由模型完成的资产盘点和范围对齐；在显式视觉通过前，输出保持 `needs_review`。
 
 <details>
@@ -128,6 +130,8 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 <img src="docs/assets/architecture.svg" alt="UltraSplitter AI 原生处理架构" width="100%">
 
 每次运行都会写入 schema v3 的 `manifest.json`，记录准确的源图坐标、路由依据、来源追踪、批准状态、有界修复次数、评估结果和绝对访问路径。完整设计见 [ARCHITECTURE.md](ARCHITECTURE.md)。
+
+评估及分层 PSD 导出流程见[Evaluator 评估流程](docs/evaluator-pipeline.zh-CN.md)。
 
 ## 当前能力边界
 
