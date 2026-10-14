@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1120" viewBox="0 0 1440 1120" role="img" aria-labelledby="title desc">
+  <title id="title">UltraSplitter 处理流程</title>
+  <desc id="desc">不规则素材图经过确定性扫描、主体规划、原像素路由和主视觉审核，最终交付命名图片、分层 PSD 与来源清单。主体不完整时，可进入经批准的修复流程。透明版本另设可选审核。</desc>
+  <defs>
+    <pattern id="paper-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#e9e8e1" stroke-width="0.7"/>
+    </pattern>
+    <pattern id="checker" width="12" height="12" patternUnits="userSpaceOnUse">
+      <rect width="12" height="12" fill="#fff"/>
+      <path d="M0 0H6V6H0ZM6 6H12V12H6Z" fill="#d7d9d8"/>
+    </pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-teal" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#16877d"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#b56b18"/>
+    </marker>
+    <style>
+      .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .serif { font-family: Georgia, "Times New Roman", serif; }
+      .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 2px; fill: #57706f; }
+      .headline { font-size: 30px; font-weight: 500; fill: #172c35; }
+      .subtitle { font-size: 14px; fill: #586b70; }
+      .stage { font-size: 12px; font-weight: 750; letter-spacing: 1.1px; fill: #52666b; }
+      .card-title { font-size: 15px; font-weight: 700; fill: #182f38; }
+      .copy { font-size: 12px; fill: #607176; }
+      .micro { font-size: 10px; font-weight: 700; letter-spacing: 1px; fill: #74858a; }
+      .panel-title { font-size: 12px; font-weight: 750; letter-spacing: 1.5px; fill: #53666b; }
+      .panel-copy { font-size: 12px; fill: #52666b; }
+      .card { fill: #fffefa; stroke: #d9ddd8; stroke-width: 1.2; }
+      .wire { fill: none; stroke: #87969a; stroke-width: 1.7; marker-end: url(#arrow); }
+      .wire-teal { fill: none; stroke: #16877d; stroke-width: 1.8; marker-end: url(#arrow-teal); }
+      .wire-amber { fill: none; stroke: #b56b18; stroke-width: 1.7; stroke-dasharray: 5 5; marker-end: url(#arrow-amber); }
+      .flowline { fill: none; stroke: #16877d; stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 1 13; animation: flow 2.8s linear infinite; }
+      .flowline-amber { fill: none; stroke: #d28b37; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1 12; animation: flow 3.4s linear infinite; }
+      @keyframes flow { to { stroke-dashoffset: -56; } }
+      @media (prefers-reduced-motion: reduce) {
+        .flowline, .flowline-amber { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1440" height="1120" fill="#f7f7f2"/>
+  <rect width="1440" height="1120" fill="url(#paper-grid)" opacity="0.44"/>
+
+  <text x="56" y="48" class="sans eyebrow">ULTRASPLITTER / 处理流程</text>
+  <text x="56" y="91" class="serif headline">从混合素材图到可追溯交付</text>
+  <text x="56" y="121" class="sans subtitle">AI 识别主体 · 确定性工具按原像素拆分 · 修复须经批准</text>
+  <path d="M56 145H1384" stroke="#d7dcd7" stroke-width="1"/>
+  <text x="1384" y="48" text-anchor="end" class="sans micro">系统视图 / 01</text>
+
+  <!-- Primary pipeline -->
+  <g class="sans">
+    <rect x="56" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="282" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="508" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="734" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="960" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="1186" y="180" width="198" height="250" rx="8" class="card"/>
+
+    <!-- 00 / source sheet -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="99,260 153,229 207,260 153,291" fill="#f5ead5" stroke="#c9b995"/>
+      <polygon points="99,260 153,291 153,303 99,272" fill="#e7d8b8" stroke="#c9b995"/>
+      <polygon points="153,291 207,260 207,272 153,303" fill="#d8c8a4" stroke="#c9b995"/>
+      <polygon points="117,259 141,245 164,258 140,272" fill="#d0e5de" stroke="#7faaa0"/>
+      <polygon points="143,275 163,264 182,275 162,287" fill="#ead6bf" stroke="#c6a879"/>
+      <polygon points="158,250 177,239 191,247 172,259" fill="#cfdae8" stroke="#91a3b8"/>
+    </g>
+    <text x="76" y="329" class="stage">00 / 输入</text>
+    <text x="76" y="354" class="card-title">不规则素材图</text>
+    <text x="76" y="379" class="copy">尺度混杂 · 间距不齐</text>
+    <text x="76" y="399" class="copy">拆分以原图像素为准</text>
+
+    <!-- 01 / deterministic scan -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="327,259 380,229 433,259 380,289" fill="#e7eff0" stroke="#9eb2b4"/>
+      <polygon points="327,259 380,289 380,301 327,271" fill="#d2e0e0" stroke="#9eb2b4"/>
+      <polygon points="380,289 433,259 433,271 380,301" fill="#c1d2d3" stroke="#9eb2b4"/>
+      <path d="M347 259L380 240L413 259M347 259L380 278L413 259M365 249V269M380 240V278M397 249V269" fill="none" stroke="#678b8d"/>
+      <path d="M353 252L407 266" stroke="#16877d" stroke-width="2"/>
+    </g>
+    <text x="302" y="329" class="stage">01 / 扫描</text>
+    <text x="302" y="354" class="card-title">确定性候选区域</text>
+    <text x="302" y="379" class="copy">分隔线或简单背景</text>
+    <text x="302" y="399" class="copy">坐标对应旋转校正后的原图</text>
+
+    <!-- 02 / host semantic plan -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="555,260 606,231 657,260 606,289" fill="#eae6f2" stroke="#a99cbd"/>
+      <polygon points="555,260 606,289 606,301 555,272" fill="#d8d0e5" stroke="#a99cbd"/>
+      <polygon points="606,289 657,260 657,272 606,301" fill="#c6bdd9" stroke="#a99cbd"/>
+      <rect x="578" y="248" width="27" height="20" rx="2" fill="#fffefa" stroke="#8c7ba7"/>
+      <rect x="611" y="248" width="27" height="20" rx="2" fill="#fffefa" stroke="#8c7ba7"/>
+      <path d="M583 254H599M583 260H596M616 254H632M616 260H629" stroke="#8c7ba7"/>
+      <circle cx="606" cy="276" r="4" fill="#b56b18"/>
+    </g>
+    <text x="528" y="329" class="stage">02 / 规划</text>
+    <text x="528" y="354" class="card-title">主体清单</text>
+    <text x="528" y="379" class="copy">识别主体并归组</text>
+    <text x="528" y="399" class="copy">范围有歧义时先确认</text>
+
+    <!-- 03 / apply and route -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="781,259 833,229 885,259 833,289" fill="#deeeea" stroke="#83aaa0"/>
+      <polygon points="781,259 833,289 833,301 781,271" fill="#c7dfd8" stroke="#83aaa0"/>
+      <polygon points="833,289 885,259 885,271 833,301" fill="#b2d2c9" stroke="#83aaa0"/>
+      <circle cx="833" cy="259" r="8" fill="#fffefa" stroke="#16877d" stroke-width="2"/>
+      <path d="M833 251V239M826 263L811 271M840 263L855 271" fill="none" stroke="#16877d" stroke-width="1.8"/>
+      <circle cx="833" cy="237" r="4" fill="#16877d"/>
+      <circle cx="808" cy="273" r="4" fill="#16877d"/>
+      <circle cx="858" cy="273" r="4" fill="#b56b18"/>
+    </g>
+    <text x="754" y="329" class="stage">03 / 执行与路由</text>
+    <text x="754" y="354" class="card-title">保留原像素的处理路径</text>
+    <text x="754" y="379" class="copy">裁切 · 合成 · 经批准的修复</text>
+    <text x="754" y="399" class="copy">补全缺失像素须经批准</text>
+
+    <!-- 04 / primary review -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="1005,261 1058,231 1111,261 1058,291" fill="#e4eceb" stroke="#93aaa6"/>
+      <polygon points="1005,261 1058,291 1058,302 1005,272" fill="#cfddda" stroke="#93aaa6"/>
+      <polygon points="1058,291 1111,261 1111,272 1058,302" fill="#bbcfca" stroke="#93aaa6"/>
+      <rect x="1032" y="248" width="48" height="27" rx="2" fill="#fffefa" stroke="#688581"/>
+      <path d="M1038 254H1055M1038 259H1055M1063 254L1068 259L1076 250" fill="none" stroke="#16877d" stroke-width="1.7"/>
+      <circle cx="1091" cy="252" r="4" fill="#16877d"/>
+    </g>
+    <text x="980" y="329" class="stage">04 / 审核</text>
+    <text x="980" y="354" class="card-title">主视觉审核</text>
+    <text x="980" y="379" class="copy">逐一对照清单与素材</text>
+    <text x="980" y="399" class="copy">通过后才能继续</text>
+
+    <!-- 05 / outputs -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="1230,259 1284,228 1338,259 1284,290" fill="#e4eee5" stroke="#97ad97"/>
+      <polygon points="1230,259 1284,290 1284,301 1230,270" fill="#d1e0d0" stroke="#97ad97"/>
+      <polygon points="1284,290 1338,259 1338,270 1284,301" fill="#bed2bd" stroke="#97ad97"/>
+      <path d="M1253 260L1270 250L1287 260L1270 270Z" fill="#fffefa" stroke="#78977b"/>
+      <path d="M1277 274L1294 264L1310 273L1293 283Z" fill="#fffefa" stroke="#78977b"/>
+      <path d="M1290 250L1307 240L1323 249L1306 259Z" fill="#fffefa" stroke="#78977b"/>
+    </g>
+    <text x="1202" y="329" class="stage">05 / 交付</text>
+    <text x="1202" y="354" class="card-title">图片 + 分层 PSD</text>
+    <text x="1202" y="379" class="copy">画布超限时自动分卷</text>
+    <text x="1202" y="399" class="copy">清单记录路径与来源</text>
+  </g>
+
+  <!-- Animated mainline: static arrows remain visible when motion is disabled. -->
+  <g>
+    <path d="M254 304H282M480 304H508M706 304H734M932 304H960M1158 304H1186" class="wire"/>
+    <path d="M254 304H282M480 304H508M706 304H734M932 304H960M1158 304H1186" class="flowline"/>
+  </g>
+
+  <!-- Approval-gated repair branch -->
+  <rect x="56" y="492" width="820" height="264" rx="8" fill="#fbf8f1" stroke="#e2d6c2" stroke-width="1.2"/>
+  <text x="80" y="526" class="sans panel-title">审批后修复 / 仅限身份明确且已获批准的主体</text>
+  <text x="80" y="548" class="sans copy">修复内容属于推断，完成后返回主视觉审核。</text>
+  <g class="sans">
+    <rect x="80" y="579" width="220" height="132" rx="5" fill="#fffefa" stroke="#d9c7a8"/>
+    <rect x="342" y="579" width="220" height="132" rx="5" fill="#fffefa" stroke="#d9c7a8"/>
+    <rect x="604" y="579" width="220" height="132" rx="5" fill="#fffefa" stroke="#d9c7a8"/>
+    <text x="98" y="606" class="micro" fill="#9a651e">A / 审批</text>
+    <text x="98" y="635" class="card-title">展示范围与成本</text>
+    <text x="98" y="660" class="panel-copy">用户先批准具体的</text>
+    <text x="98" y="678" class="panel-copy">修复组，再开始生成。</text>
+    <text x="360" y="606" class="micro" fill="#9a651e">B / 生成</text>
+    <text x="360" y="635" class="card-title">一次受限网格</text>
+    <text x="360" y="660" class="panel-copy">每个冲突组只生成一个</text>
+    <text x="360" y="678" class="panel-copy">规则网格；标记生成像素。</text>
+    <text x="622" y="606" class="micro" fill="#9a651e">C / 导入</text>
+    <text x="622" y="635" class="card-title">校验并重新拆分</text>
+    <text x="622" y="660" class="panel-copy">通过确定性检查后，</text>
+    <text x="622" y="678" class="panel-copy">返回主视觉审核。</text>
+  </g>
+  <path d="M300 646H342M562 646H604" class="wire-amber"/>
+  <path d="M300 646H342M562 646H604" class="flowline-amber"/>
+  <path d="M833 430V466H470V579" class="wire-amber"/>
+  <path d="M833 430V466H470V579" class="flowline-amber"/>
+  <text x="525" y="461" class="sans micro" fill="#9a651e">主体不完整 / 被截断</text>
+  <path d="M824 646H910V452H1059V430" class="wire-teal"/>
+  <path d="M824 646H910V452H1059V430" class="flowline"/>
+
+  <!-- Optional alpha review after primary review -->
+  <rect x="932" y="492" width="452" height="264" rx="8" fill="#f3f5f1" stroke="#d2dcd5" stroke-width="1.2"/>
+  <text x="956" y="526" class="sans panel-title">可选 / 透明版本审核</text>
+  <text x="956" y="548" class="sans copy">主资产通过后单独审核。</text>
+  <path d="M1059 430V492" class="wire"/>
+  <text x="1074" y="468" class="sans micro">可选</text>
+  <g class="sans">
+    <rect x="958" y="579" width="112" height="82" rx="4" fill="#fff" stroke="#cbd3ce"/>
+    <rect x="1102" y="579" width="112" height="82" rx="4" fill="#171b1c" stroke="#444d4c"/>
+    <rect x="1246" y="579" width="112" height="82" rx="4" fill="url(#checker)" stroke="#cbd3ce"/>
+    <path d="M990 633L1013 601L1038 633Z" fill="#d9a15b" stroke="#ad7c41"/>
+    <path d="M1134 633L1157 601L1182 633Z" fill="#d9a15b" stroke="#ad7c41"/>
+    <path d="M1278 633L1301 601L1326 633Z" fill="#d9a15b" stroke="#ad7c41"/>
+    <text x="1014" y="682" text-anchor="middle" class="micro">白底</text>
+    <text x="1158" y="682" text-anchor="middle" class="micro">黑底</text>
+    <text x="1302" y="682" text-anchor="middle" class="micro">棋盘格</text>
+    <text x="956" y="724" class="sans copy">透明 PNG 通过独立视觉审核后才会纳入交付。</text>
+  </g>
+  <path d="M1384 624H1406V454H1285V430" class="wire"/>
+
+  <!-- Delivery contract -->
+  <path d="M56 800H1384" stroke="#d7dcd7" stroke-width="1"/>
+  <text x="56" y="832" class="sans panel-title">交付规范</text>
+  <text x="56" y="860" class="sans card-title">命名图片 + 分层 PSD 分卷</text>
+  <text x="56" y="883" class="sans copy">主视觉审核通过后导出 PSD。</text>
+  <path d="M486 824V890" stroke="#d7dcd7"/>
+  <text x="520" y="832" class="sans panel-title">画布上限</text>
+  <text x="520" y="860" class="sans card-title">每边 30,000 px</text>
+  <text x="520" y="883" class="sans copy">超限时增加 PSD 分卷；单件过大则按原像素切块。</text>
+  <path d="M1010 824V890" stroke="#d7dcd7"/>
+  <text x="1044" y="832" class="sans panel-title">来源追踪</text>
+  <text x="1044" y="860" class="sans card-title">路径、处理方式与审核状态</text>
+  <text x="1044" y="883" class="sans copy">记录于 schema-v3 manifest。</text>
+
+  <!-- 校验方法维度：区分确定性检查、视觉审查与 manifest 门控。 -->
+  <rect x="56" y="912" width="1328" height="144" rx="8" fill="#f0f3ef" stroke="#d2dcd5" stroke-width="1.2"/>
+  <text x="80" y="940" class="sans panel-title">校验方法 / 三个不同的证据层</text>
+  <path d="M486 956V1036M910 956V1036" stroke="#d2dcd5"/>
+  <text x="80" y="972" class="sans stage">确定性检查 / 修复宫格</text>
+  <text x="80" y="995" class="sans copy">分辨率 · 有效格数 · 背景一致性</text>
+  <text x="80" y="1015" class="sans copy">触边 · 安全留白 · 重复图形</text>
+  <text x="510" y="972" class="sans stage">视觉审核 / 全部主资产</text>
+  <text x="510" y="995" class="sans copy">身份 · 姿态 · 轮廓 · 色彩</text>
+  <text x="510" y="1015" class="sans copy">材质 · 装饰 · 是否发生重设计</text>
+  <text x="934" y="972" class="sans stage">Manifest 门控 / 导出条件</text>
+  <text x="934" y="995" class="sans copy">Schema v3 · 分诊 · 批准 · 重试上限</text>
+  <text x="934" y="1015" class="sans copy">主视觉结论通过后才导出 PSD</text>
+  <text x="80" y="1040" class="sans micro">自动检查定位可量化缺陷；视觉审核判断主体一致性；manifest 门控决定能否导出 PSD。</text>
+
+  <text x="56" y="1092" class="sans micro">原图像素</text>
+  <circle cx="168" cy="1088" r="4" fill="#16877d"/>
+  <text x="184" y="1092" class="sans micro">经批准的图像修复</text>
+  <circle cx="399" cy="1088" r="4" fill="#b56b18"/>
+  <text x="415" y="1092" class="sans micro">可选透明版本审核</text>
+  <circle cx="585" cy="1088" r="4" fill="#8b79a9"/>
+</svg>

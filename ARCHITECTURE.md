@@ -8,7 +8,7 @@ The core package is provider-neutral. A multimodal host such as Codex or Claude 
 
 ## Processing model
 
-<img src="docs/assets/architecture.svg" alt="Processing pipeline from irregular source sheet through scanning, semantic planning, source-pixel routing, primary review, optional transparency review, and PNG plus layered PSD delivery" width="100%">
+<img src="docs/assets/architecture.svg" alt="Processing pipeline with deterministic repair-grid checks, visual review of every primary asset, manifest export gates, optional transparency review, and PNG plus layered PSD delivery" width="100%">
 
 ### Scan
 
