@@ -62,13 +62,15 @@
     <rect x="1186" y="180" width="198" height="250" rx="8" class="card"/>
 
     <!-- 00 / source sheet -->
-    <g stroke-linejoin="round" stroke-width="1.2">
-      <polygon points="99,260 153,229 207,260 153,291" fill="#f5ead5" stroke="#c9b995"/>
-      <polygon points="99,260 153,291 153,303 99,272" fill="#e7d8b8" stroke="#c9b995"/>
-      <polygon points="153,291 207,260 207,272 153,303" fill="#d8c8a4" stroke="#c9b995"/>
-      <polygon points="117,259 141,245 164,258 140,272" fill="#d0e5de" stroke="#7faaa0"/>
-      <polygon points="143,275 163,264 182,275 162,287" fill="#ead6bf" stroke="#c6a879"/>
-      <polygon points="158,250 177,239 191,247 172,259" fill="#cfdae8" stroke="#91a3b8"/>
+        <g stroke-linejoin="round" stroke-width="1.4">
+      <rect x="103" y="230" width="100" height="72" rx="4" fill="#fffefa" stroke="#b8c4bf"/>
+      <path d="M103 241H203" stroke="#d9ddd8"/>
+      <circle cx="111" cy="235.5" r="1.5" fill="#d28b37"/><circle cx="117" cy="235.5" r="1.5" fill="#16877d"/><circle cx="123" cy="235.5" r="1.5" fill="#8b79a9"/>
+      <path d="M113 276L116 254L125 247L137 251L141 265L134 278Z" fill="#d0e5de" stroke="#7faaa0"/>
+      <rect x="148" y="248" width="25" height="22" rx="3" fill="#cfdae8" stroke="#91a3b8"/>
+      <path d="M153 264L159 256L164 261L168 255L171 264Z" fill="#fffefa" stroke="#91a3b8"/>
+      <path d="M176 276L181 259L190 256L196 262L193 278Z" fill="#ead6bf" stroke="#c6a879"/>
+      <circle cx="184" cy="264" r="2" fill="#c6a879"/>
     </g>
     <text x="76" y="329" class="stage">00 / 输入</text>
     <text x="76" y="354" class="card-title">不规则素材图</text>
@@ -76,12 +78,13 @@
     <text x="76" y="399" class="copy">拆分以原图像素为准</text>
 
     <!-- 01 / deterministic scan -->
-    <g stroke-linejoin="round" stroke-width="1.2">
-      <polygon points="327,259 380,229 433,259 380,289" fill="#e7eff0" stroke="#9eb2b4"/>
-      <polygon points="327,259 380,289 380,301 327,271" fill="#d2e0e0" stroke="#9eb2b4"/>
-      <polygon points="380,289 433,259 433,271 380,301" fill="#c1d2d3" stroke="#9eb2b4"/>
-      <path d="M347 259L380 240L413 259M347 259L380 278L413 259M365 249V269M380 240V278M397 249V269" fill="none" stroke="#678b8d"/>
-      <path d="M353 252L407 266" stroke="#16877d" stroke-width="2"/>
+        <g stroke-linejoin="round" stroke-width="1.4">
+      <rect x="330" y="232" width="100" height="68" rx="3" fill="#fffefa" stroke="#9eb2b4"/>
+      <path d="M338 242H422M338 290H422" stroke="#d5dfde" stroke-width="1"/>
+      <rect x="340" y="246" width="29" height="25" rx="2" fill="#d0e5de" fill-opacity=".55" stroke="#16877d" stroke-dasharray="4 3"/>
+      <rect x="376" y="245" width="38" height="39" rx="2" fill="#cfdae8" fill-opacity=".45" stroke="#678b8d" stroke-dasharray="4 3"/>
+      <rect x="390" y="250" width="17" height="17" rx="1" fill="#ead6bf" fill-opacity=".75" stroke="#b56b18" stroke-dasharray="3 2"/>
+      <path d="M340 242V246M336 246H340M414 241H418V245" fill="none" stroke="#16877d" stroke-width="1.8"/>
     </g>
     <text x="302" y="329" class="stage">01 / 扫描</text>
     <text x="302" y="354" class="card-title">确定性候选区域</text>
@@ -89,14 +92,15 @@
     <text x="302" y="399" class="copy">坐标对应旋转校正后的原图</text>
 
     <!-- 02 / host semantic plan -->
-    <g stroke-linejoin="round" stroke-width="1.2">
-      <polygon points="555,260 606,231 657,260 606,289" fill="#eae6f2" stroke="#a99cbd"/>
-      <polygon points="555,260 606,289 606,301 555,272" fill="#d8d0e5" stroke="#a99cbd"/>
-      <polygon points="606,289 657,260 657,272 606,301" fill="#c6bdd9" stroke="#a99cbd"/>
-      <rect x="578" y="248" width="27" height="20" rx="2" fill="#fffefa" stroke="#8c7ba7"/>
-      <rect x="611" y="248" width="27" height="20" rx="2" fill="#fffefa" stroke="#8c7ba7"/>
-      <path d="M583 254H599M583 260H596M616 254H632M616 260H629" stroke="#8c7ba7"/>
-      <circle cx="606" cy="276" r="4" fill="#b56b18"/>
+        <g stroke-linejoin="round" stroke-width="1.4">
+      <rect x="558" y="230" width="96" height="72" rx="4" fill="#fffefa" stroke="#a99cbd"/>
+      <path d="M578 230V237H634V230" fill="#d8d0e5" stroke="#a99cbd"/>
+      <rect x="568" y="246" width="14" height="12" rx="2" fill="#eae6f2" stroke="#8c7ba7"/>
+      <path d="M588 249H640M588 254H627" stroke="#8c7ba7"/>
+      <rect x="568" y="263" width="14" height="12" rx="2" fill="#deeeea" stroke="#83aaa0"/>
+      <path d="M588 266H640M588 271H630" stroke="#83aaa0"/>
+      <rect x="568" y="280" width="14" height="12" rx="2" fill="#f5ead5" stroke="#c9b995"/>
+      <path d="M588 283H640M588 288H621" stroke="#b56b18"/>
     </g>
     <text x="528" y="329" class="stage">02 / 规划</text>
     <text x="528" y="354" class="card-title">主体清单</text>
@@ -104,15 +108,15 @@
     <text x="528" y="399" class="copy">范围有歧义时先确认</text>
 
     <!-- 03 / apply and route -->
-    <g stroke-linejoin="round" stroke-width="1.2">
-      <polygon points="781,259 833,229 885,259 833,289" fill="#deeeea" stroke="#83aaa0"/>
-      <polygon points="781,259 833,289 833,301 781,271" fill="#c7dfd8" stroke="#83aaa0"/>
-      <polygon points="833,289 885,259 885,271 833,301" fill="#b2d2c9" stroke="#83aaa0"/>
-      <circle cx="833" cy="259" r="8" fill="#fffefa" stroke="#16877d" stroke-width="2"/>
-      <path d="M833 251V239M826 263L811 271M840 263L855 271" fill="none" stroke="#16877d" stroke-width="1.8"/>
-      <circle cx="833" cy="237" r="4" fill="#16877d"/>
-      <circle cx="808" cy="273" r="4" fill="#16877d"/>
-      <circle cx="858" cy="273" r="4" fill="#b56b18"/>
+        <g stroke-linejoin="round" stroke-width="1.5" fill="none">
+      <rect x="780" y="249" width="34" height="31" rx="3" fill="#deeeea" stroke="#83aaa0"/>
+      <path d="M787 256H807M787 262H803M787 268H800" stroke="#16877d"/>
+      <path d="M814 264H827M827 264V240H842M827 264H842M827 264V288H842" stroke="#16877d"/>
+      <rect x="843" y="232" width="37" height="16" rx="3" fill="#fffefa" stroke="#83aaa0"/>
+      <rect x="843" y="256" width="37" height="16" rx="3" fill="#fffefa" stroke="#83aaa0"/>
+      <rect x="843" y="280" width="37" height="16" rx="3" fill="#fbf3e6" stroke="#b56b18"/>
+      <path d="M849 237H874M849 261H874M849 285H867" stroke="#678b8d"/>
+      <circle cx="875" cy="288" r="2" fill="#b56b18" stroke="none"/>
     </g>
     <text x="754" y="329" class="stage">03 / 执行与路由</text>
     <text x="754" y="354" class="card-title">保留原像素的处理路径</text>
@@ -120,13 +124,17 @@
     <text x="754" y="399" class="copy">补全缺失像素须经批准</text>
 
     <!-- 04 / primary review -->
-    <g stroke-linejoin="round" stroke-width="1.2">
-      <polygon points="1005,261 1058,231 1111,261 1058,291" fill="#e4eceb" stroke="#93aaa6"/>
-      <polygon points="1005,261 1058,291 1058,302 1005,272" fill="#cfddda" stroke="#93aaa6"/>
-      <polygon points="1058,291 1111,261 1111,272 1058,302" fill="#bbcfca" stroke="#93aaa6"/>
-      <rect x="1032" y="248" width="48" height="27" rx="2" fill="#fffefa" stroke="#688581"/>
-      <path d="M1038 254H1055M1038 259H1055M1063 254L1068 259L1076 250" fill="none" stroke="#16877d" stroke-width="1.7"/>
-      <circle cx="1091" cy="252" r="4" fill="#16877d"/>
+        <g stroke-linejoin="round" stroke-width="1.4">
+      <rect x="1017" y="230" width="82" height="72" rx="4" fill="#fffefa" stroke="#93aaa6"/>
+      <path d="M1034 230V237H1082V230" fill="#cfddda" stroke="#93aaa6"/>
+      <rect x="1027" y="247" width="10" height="10" rx="2" fill="#deeeea" stroke="#16877d"/>
+      <path d="M1029 252L1032 255L1036 249M1043 250H1088" fill="none" stroke="#16877d"/>
+      <rect x="1027" y="263" width="10" height="10" rx="2" fill="#deeeea" stroke="#16877d"/>
+      <path d="M1029 268L1032 271L1036 265M1043 266H1088" fill="none" stroke="#16877d"/>
+      <rect x="1027" y="279" width="10" height="10" rx="2" fill="#fffefa" stroke="#93aaa6"/>
+      <path d="M1043 282H1075" stroke="#93aaa6"/>
+      <circle cx="1084" cy="286" r="9" fill="#e4eceb" stroke="#688581"/>
+      <path d="M1090 293L1096 299" stroke="#688581" stroke-width="2"/>
     </g>
     <text x="980" y="329" class="stage">04 / 审核</text>
     <text x="980" y="354" class="card-title">主视觉审核</text>
@@ -134,13 +142,14 @@
     <text x="980" y="399" class="copy">通过后才能继续</text>
 
     <!-- 05 / outputs -->
-    <g stroke-linejoin="round" stroke-width="1.2">
-      <polygon points="1230,259 1284,228 1338,259 1284,290" fill="#e4eee5" stroke="#97ad97"/>
-      <polygon points="1230,259 1284,290 1284,301 1230,270" fill="#d1e0d0" stroke="#97ad97"/>
-      <polygon points="1284,290 1338,259 1338,270 1284,301" fill="#bed2bd" stroke="#97ad97"/>
-      <path d="M1253 260L1270 250L1287 260L1270 270Z" fill="#fffefa" stroke="#78977b"/>
-      <path d="M1277 274L1294 264L1310 273L1293 283Z" fill="#fffefa" stroke="#78977b"/>
-      <path d="M1290 250L1307 240L1323 249L1306 259Z" fill="#fffefa" stroke="#78977b"/>
+        <g stroke-linejoin="round" stroke-width="1.4">
+      <rect x="1240" y="236" width="46" height="60" rx="3" fill="#fffefa" stroke="#97ad97"/>
+      <path d="M1247 276L1257 263L1264 270L1272 258L1280 276Z" fill="#d1e0d0" stroke="#78977b"/>
+      <circle cx="1273" cy="249" r="3" fill="#d9a15b"/>
+      <text x="1247" y="290" font-size="7" font-weight="700" fill="#52666b">PNG</text>
+      <rect x="1300" y="232" width="48" height="64" rx="3" fill="#fffefa" stroke="#97ad97"/>
+      <path d="M1307 246H1341M1307 253H1335M1307 260H1341M1307 267H1335M1307 274H1341" stroke="#83aaa0" stroke-width="2"/>
+      <text x="1307" y="289" font-size="7" font-weight="700" fill="#52666b">PSD</text>
     </g>
     <text x="1202" y="329" class="stage">05 / 交付</text>
     <text x="1202" y="354" class="card-title">图片 + 分层 PSD</text>
