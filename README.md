@@ -129,7 +129,7 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 
 ## Architecture
 
-<img src="docs/assets/architecture.svg" alt="Processing pipeline with deterministic repair-grid checks, visual review of every primary asset, manifest export gates, optional transparency review, and PNG plus layered PSD delivery" width="100%">
+<img src="docs/assets/architecture.svg" alt="Processing pipeline and validation catalog grouped by method, dimension, and keywords: repair-grid integrity, primary visual consistency, manifest gates, transparency checks, and PSD delivery constraints" width="100%">
 
 Every run writes a schema-v3 manifest with exact source coordinates, route evidence, provenance, approval state, bounded repair attempts, evaluation status, and absolute delivery paths. See [ARCHITECTURE.md](ARCHITECTURE.md).
 

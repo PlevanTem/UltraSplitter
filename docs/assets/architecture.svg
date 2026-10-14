@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1120" viewBox="0 0 1440 1120" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1160" viewBox="0 0 1440 1160" role="img" aria-labelledby="title desc">
   <title id="title">UltraSplitter processing model</title>
-  <desc id="desc">An irregular asset sheet passes through deterministic scanning, host-led semantic planning, source-pixel routing, primary visual review, and delivery as named images, layered PSD pages, and a provenance manifest. Incomplete subjects may enter an approval-gated reconstruction path. Transparent variants use a separate optional review gate.</desc>
+  <desc id="desc">An irregular asset sheet passes through deterministic scanning, semantic planning, source-pixel routing, and primary visual review. A validation catalog groups repair-grid checks, host visual review, manifest gates, alpha review, and PSD delivery constraints by method, dimension, and keywords. Outputs include named images, layered PSD pages, and provenance.</desc>
   <defs>
     <pattern id="paper-grid" width="24" height="24" patternUnits="userSpaceOnUse">
       <path d="M24 0H0V24" fill="none" stroke="#e9e8e1" stroke-width="0.7"/>
@@ -43,8 +43,8 @@
     </style>
   </defs>
 
-  <rect width="1440" height="1120" fill="#f7f7f2"/>
-  <rect width="1440" height="1120" fill="url(#paper-grid)" opacity="0.44"/>
+  <rect width="1440" height="1160" fill="#f7f7f2"/>
+  <rect width="1440" height="1160" fill="url(#paper-grid)" opacity="0.44"/>
 
   <text x="56" y="48" class="sans eyebrow">ULTRASPLITTER / PROCESSING MODEL</text>
   <text x="56" y="91" class="serif headline">From mixed sheet to traceable delivery</text>
@@ -226,25 +226,39 @@
   <text x="1044" y="860" class="sans card-title">Paths, routes + review state</text>
   <text x="1044" y="883" class="sans copy">Recorded in the schema-v3 manifest.</text>
 
-  <!-- Validation dimensions: separate deterministic, visual, and manifest gates. -->
-  <rect x="56" y="912" width="1328" height="144" rx="8" fill="#f0f3ef" stroke="#d2dcd5" stroke-width="1.2"/>
-  <text x="80" y="940" class="sans panel-title">VALIDATION METHODS / THREE DISTINCT EVIDENCE LAYERS</text>
-  <path d="M486 956V1036M910 956V1036" stroke="#d2dcd5"/>
-  <text x="80" y="972" class="sans stage">DETERMINISTIC / REPAIR GRID</text>
-  <text x="80" y="995" class="sans copy">Resolution · occupied count · background consistency</text>
-  <text x="80" y="1015" class="sans copy">Edge contact · safe margin · duplicate shapes</text>
-  <text x="510" y="972" class="sans stage">VISUAL / ALL PRIMARY ASSETS</text>
-  <text x="510" y="995" class="sans copy">Identity · pose · silhouette · color</text>
-  <text x="510" y="1015" class="sans copy">Material · ornament · absence of redesign</text>
-  <text x="934" y="972" class="sans stage">MANIFEST / EXPORT GATE</text>
-  <text x="934" y="995" class="sans copy">Schema v3 · triage · approval · retry limit</text>
-  <text x="934" y="1015" class="sans copy">Visual verdict must pass before PSD export</text>
-  <text x="80" y="1040" class="sans micro">AUTOMATED CHECKS FLAG MEASURABLE DEFECTS; VISUAL REVIEW CHECKS IDENTITY; THE MANIFEST GATE CONTROLS PSD EXPORT.</text>
+  <!-- Validation catalog: method, dimension, keywords. -->
+  <rect x="56" y="912" width="1328" height="186" rx="8" fill="#f0f3ef" stroke="#d2dcd5" stroke-width="1.2"/>
+  <text x="80" y="940" class="sans panel-title">VALIDATION / METHOD → DIMENSION → KEYWORDS</text>
+  <path d="M326 956V1060M592 956V1060M858 956V1060M1124 956V1060" stroke="#d2dcd5"/>
+  <text x="80" y="972" class="sans stage">DETERMINISTIC CHECK</text>
+  <text x="80" y="991" class="sans card-title">Quantity &amp; grid integrity</text>
+  <text x="80" y="1011" class="sans copy">≥512 px/cell · expected = occupied</text>
+  <text x="80" y="1027" class="sans copy">background · edge · ≥8% margin</text>
+  <text x="80" y="1043" class="sans copy">possible duplicates*</text>
+  <text x="346" y="972" class="sans stage">HOST VISUAL REVIEW</text>
+  <text x="346" y="991" class="sans card-title">Inventory &amp; visual consistency</text>
+  <text x="346" y="1011" class="sans copy">count · no missing/extra assets</text>
+  <text x="346" y="1027" class="sans copy">identity · pose · silhouette</text>
+  <text x="346" y="1043" class="sans copy">color · material · no redesign</text>
+  <text x="612" y="972" class="sans stage">MANIFEST GATE</text>
+  <text x="612" y="991" class="sans card-title">Workflow eligibility</text>
+  <text x="612" y="1011" class="sans copy">Schema v3 · triage · approval</text>
+  <text x="612" y="1027" class="sans copy">attempts ≤2 · visual = pass</text>
+  <text x="878" y="972" class="sans stage">ALPHA CHECK + REVIEW</text>
+  <text x="878" y="991" class="sans card-title">Transparent-variant quality</text>
+  <text x="878" y="1011" class="sans copy">real alpha · transparent background</text>
+  <text x="878" y="1027" class="sans copy">foreground · edge · ≥8% margin</text>
+  <text x="878" y="1043" class="sans copy">holes · white · black · checkerboard</text>
+  <text x="1144" y="972" class="sans stage">PSD EXPORT</text>
+  <text x="1144" y="991" class="sans card-title">Delivery integrity</text>
+  <text x="1144" y="1011" class="sans copy">native pixels · ≤30,000 px/side</text>
+  <text x="1144" y="1027" class="sans copy">pages · tiles · manifest paths</text>
+  <text x="80" y="1080" class="sans micro">* REPAIR-GRID METRICS APPLY TO GENERATED GRIDS; POSSIBLE DUPLICATES ARE FLAGGED FOR REVIEW. SEMANTIC IDENTITY REQUIRES HOST VISUAL REVIEW.</text>
 
-  <text x="56" y="1092" class="sans micro">SOURCE PIXELS</text>
-  <circle cx="168" cy="1088" r="4" fill="#16877d"/>
-  <text x="184" y="1092" class="sans micro">APPROVAL-GATED RECONSTRUCTION</text>
-  <circle cx="399" cy="1088" r="4" fill="#b56b18"/>
-  <text x="415" y="1092" class="sans micro">OPTIONAL ALPHA REVIEW</text>
-  <circle cx="585" cy="1088" r="4" fill="#8b79a9"/>
+  <text x="56" y="1138" class="sans micro">SOURCE PIXELS</text>
+  <circle cx="168" cy="1134" r="4" fill="#16877d"/>
+  <text x="184" y="1138" class="sans micro">APPROVAL-GATED RECONSTRUCTION</text>
+  <circle cx="399" cy="1134" r="4" fill="#b56b18"/>
+  <text x="415" y="1138" class="sans micro">OPTIONAL ALPHA REVIEW</text>
+  <circle cx="585" cy="1134" r="4" fill="#8b79a9"/>
 </svg>

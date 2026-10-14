@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1120" viewBox="0 0 1440 1120" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1160" viewBox="0 0 1440 1160" role="img" aria-labelledby="title desc">
   <title id="title">UltraSplitter 处理流程</title>
-  <desc id="desc">不规则素材图经过确定性扫描、主体规划、原像素路由和主视觉审核，最终交付命名图片、分层 PSD 与来源清单。主体不完整时，可进入经批准的修复流程。透明版本另设可选审核。</desc>
+  <desc id="desc">不规则素材图经过确定性扫描、主体规划、原像素路由和主视觉审核。校验目录按方法、维度和关键词归类修复宫格检查、主体视觉审查、manifest 门控、透明版本审核和 PSD 交付约束。</desc>
   <defs>
     <pattern id="paper-grid" width="24" height="24" patternUnits="userSpaceOnUse">
       <path d="M24 0H0V24" fill="none" stroke="#e9e8e1" stroke-width="0.7"/>
@@ -43,8 +43,8 @@
     </style>
   </defs>
 
-  <rect width="1440" height="1120" fill="#f7f7f2"/>
-  <rect width="1440" height="1120" fill="url(#paper-grid)" opacity="0.44"/>
+  <rect width="1440" height="1160" fill="#f7f7f2"/>
+  <rect width="1440" height="1160" fill="url(#paper-grid)" opacity="0.44"/>
 
   <text x="56" y="48" class="sans eyebrow">ULTRASPLITTER / 处理流程</text>
   <text x="56" y="91" class="serif headline">从混合素材图到可追溯交付</text>
@@ -226,25 +226,39 @@
   <text x="1044" y="860" class="sans card-title">路径、处理方式与审核状态</text>
   <text x="1044" y="883" class="sans copy">记录于 schema-v3 manifest。</text>
 
-  <!-- 校验方法维度：区分确定性检查、视觉审查与 manifest 门控。 -->
-  <rect x="56" y="912" width="1328" height="144" rx="8" fill="#f0f3ef" stroke="#d2dcd5" stroke-width="1.2"/>
-  <text x="80" y="940" class="sans panel-title">校验方法 / 三个不同的证据层</text>
-  <path d="M486 956V1036M910 956V1036" stroke="#d2dcd5"/>
-  <text x="80" y="972" class="sans stage">确定性检查 / 修复宫格</text>
-  <text x="80" y="995" class="sans copy">分辨率 · 有效格数 · 背景一致性</text>
-  <text x="80" y="1015" class="sans copy">触边 · 安全留白 · 重复图形</text>
-  <text x="510" y="972" class="sans stage">视觉审核 / 全部主资产</text>
-  <text x="510" y="995" class="sans copy">身份 · 姿态 · 轮廓 · 色彩</text>
-  <text x="510" y="1015" class="sans copy">材质 · 装饰 · 是否发生重设计</text>
-  <text x="934" y="972" class="sans stage">Manifest 门控 / 导出条件</text>
-  <text x="934" y="995" class="sans copy">Schema v3 · 分诊 · 批准 · 重试上限</text>
-  <text x="934" y="1015" class="sans copy">主视觉结论通过后才导出 PSD</text>
-  <text x="80" y="1040" class="sans micro">自动检查定位可量化缺陷；视觉审核判断主体一致性；manifest 门控决定能否导出 PSD。</text>
+  <!-- 校验目录：方法、维度、关键词。 -->
+  <rect x="56" y="912" width="1328" height="186" rx="8" fill="#f0f3ef" stroke="#d2dcd5" stroke-width="1.2"/>
+  <text x="80" y="940" class="sans panel-title">校验方法 / 方法 → 维度 → 关键词</text>
+  <path d="M326 956V1060M592 956V1060M858 956V1060M1124 956V1060" stroke="#d2dcd5"/>
+  <text x="80" y="972" class="sans stage">确定性检查</text>
+  <text x="80" y="991" class="sans card-title">数量与宫格完整性</text>
+  <text x="80" y="1011" class="sans copy">每格 ≥512 px · 预期=有效格数</text>
+  <text x="80" y="1027" class="sans copy">背景 · 触边 · 留白 ≥8%</text>
+  <text x="80" y="1043" class="sans copy">疑似重复图形*</text>
+  <text x="346" y="972" class="sans stage">宿主视觉审查</text>
+  <text x="346" y="991" class="sans card-title">清单完整性与视觉一致性</text>
+  <text x="346" y="1011" class="sans copy">数量 · 不漏项 · 不多项</text>
+  <text x="346" y="1027" class="sans copy">身份 · 姿态 · 轮廓</text>
+  <text x="346" y="1043" class="sans copy">颜色 · 材质 · 装饰 · 不重设计</text>
+  <text x="612" y="972" class="sans stage">Manifest 门控</text>
+  <text x="612" y="991" class="sans card-title">流程交付资格</text>
+  <text x="612" y="1011" class="sans copy">Schema v3 · 分诊 · 批准</text>
+  <text x="612" y="1027" class="sans copy">重试 ≤2 次 · 视觉结论 pass</text>
+  <text x="878" y="972" class="sans stage">Alpha 校验与审查</text>
+  <text x="878" y="991" class="sans card-title">透明版本质量</text>
+  <text x="878" y="1011" class="sans copy">真实 Alpha · 透明背景</text>
+  <text x="878" y="1027" class="sans copy">前景 · 触边 · 留白 ≥8%</text>
+  <text x="878" y="1043" class="sans copy">内部空洞 · 白底 · 黑底 · 棋盘格</text>
+  <text x="1144" y="972" class="sans stage">PSD 导出</text>
+  <text x="1144" y="991" class="sans card-title">交付完整性</text>
+  <text x="1144" y="1011" class="sans copy">原像素 · 单边 ≤30,000 px</text>
+  <text x="1144" y="1027" class="sans copy">分卷 · 切块 · manifest 路径</text>
+  <text x="80" y="1080" class="sans micro">* 宫格量化检查只针对生成式修复；疑似重复项会标记供复核。主体语义一致性仍须视觉审查。</text>
 
-  <text x="56" y="1092" class="sans micro">原图像素</text>
-  <circle cx="168" cy="1088" r="4" fill="#16877d"/>
-  <text x="184" y="1092" class="sans micro">经批准的图像修复</text>
-  <circle cx="399" cy="1088" r="4" fill="#b56b18"/>
-  <text x="415" y="1092" class="sans micro">可选透明版本审核</text>
-  <circle cx="585" cy="1088" r="4" fill="#8b79a9"/>
+  <text x="56" y="1138" class="sans micro">原图像素</text>
+  <circle cx="168" cy="1134" r="4" fill="#16877d"/>
+  <text x="184" y="1138" class="sans micro">经批准的图像修复</text>
+  <circle cx="399" cy="1134" r="4" fill="#b56b18"/>
+  <text x="415" y="1138" class="sans micro">可选透明版本审核</text>
+  <circle cx="585" cy="1134" r="4" fill="#8b79a9"/>
 </svg>

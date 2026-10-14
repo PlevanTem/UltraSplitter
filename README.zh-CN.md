@@ -129,7 +129,7 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 
 ## 架构
 
-<img src="docs/assets/architecture.zh-CN.svg" alt="不规则素材图经过修复宫格确定性检查、主资产视觉审核和 manifest 导出门控后，交付图片与分层 PSD；另含可选透明版本审核和审批后修复路径" width="100%">
+<img src="docs/assets/architecture.zh-CN.svg" alt="按方法、维度和关键词归类的评估管线：修复宫格完整性、主资产视觉一致性、manifest 门控、透明版本检查与 PSD 交付约束" width="100%">
 
 每次运行都会写入 schema v3 的 `manifest.json`，记录准确的源图坐标、路由依据、来源追踪、批准状态、有界修复次数、评估结果和绝对访问路径。完整设计见 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
