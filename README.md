@@ -8,7 +8,9 @@
 
 <sub>Illustrated workflow · <a href="docs/assets/banner-static.png">Static view</a></sub>
 
-**Turn AIGC sheets into individual assets your production pipeline can actually use.**
+**Split irregular asset sheets into reviewable, traceable assets.**
+
+AI identifies subjects; deterministic code splits original pixels into individual images and a layered PSD.
 
 Image models are good at presenting a family of ideas in one image: a UI icon set, weapon collection, character turnaround, building elevation sheet, furniture board, or product-variant grid. The sheet may look finished, but the assets inside it are still trapped in one bitmap. Uneven spacing, mixed scale, labels, touching silhouettes, and edge-clipped subjects make equal slicing unreliable.
 
@@ -127,7 +129,7 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 
 ## Architecture
 
-<img src="docs/assets/architecture.svg" alt="UltraSplitter agent-native processing architecture" width="100%">
+<img src="docs/assets/architecture.svg" alt="Processing pipeline from irregular source sheet through scanning, semantic planning, source-pixel routing, primary review, optional transparency review, and PNG plus layered PSD delivery" width="100%">
 
 Every run writes a schema-v3 manifest with exact source coordinates, route evidence, provenance, approval state, bounded repair attempts, evaluation status, and absolute delivery paths. See [ARCHITECTURE.md](ARCHITECTURE.md).
 

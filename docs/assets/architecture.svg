@@ -1,131 +1,225 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="720" viewBox="0 0 1440 720" role="img" aria-labelledby="title desc">
-  <title id="title">UltraSplitter agent-native architecture</title>
-  <desc id="desc">A generated asset sheet flows through deterministic scanning, multimodal inventory and scope alignment, source-preserving routes, approval-gated reconstruction, primary delivery review, optional independent transparent-variant review, bounded reflection, and final delivery.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" role="img" aria-labelledby="title desc">
+  <title id="title">UltraSplitter processing model</title>
+  <desc id="desc">An irregular asset sheet passes through deterministic scanning, host-led semantic planning, source-pixel routing, primary visual review, and delivery as named images, layered PSD pages, and a provenance manifest. Incomplete subjects may enter an approval-gated reconstruction path. Transparent variants use a separate optional review gate.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#09111f"/>
-      <stop offset="1" stop-color="#111c31"/>
-    </linearGradient>
-    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.5" fill="#26344c"/>
+    <pattern id="paper-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#e9e8e1" stroke-width="0.7"/>
     </pattern>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#02050a" flood-opacity="0.4"/>
-    </filter>
-    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
-      <path d="M0,0 L9,4.5 L0,9 z" fill="#7185a6"/>
+    <pattern id="checker" width="12" height="12" patternUnits="userSpaceOnUse">
+      <rect width="12" height="12" fill="#fff"/>
+      <path d="M0 0H6V6H0ZM6 6H12V12H6Z" fill="#d7d9d8"/>
+    </pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-teal" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#16877d"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#b56b18"/>
     </marker>
     <style>
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-      .title { font-size: 28px; font-weight: 700; fill: #f5f8ff; letter-spacing: 1px; }
-      .eyebrow { font-size: 14px; font-weight: 700; fill: #7dd3fc; letter-spacing: 2px; }
-      .box-title { font-size: 18px; font-weight: 700; fill: #f8fafc; }
-      .box-copy { font-size: 14px; fill: #aebcd2; }
-      .route { font-size: 15px; font-weight: 700; }
-      .wire { fill: none; stroke: #7185a6; stroke-width: 2.5; marker-end: url(#arrow); }
-      .soft-wire { fill: none; stroke: #4e607e; stroke-width: 2; stroke-dasharray: 7 7; marker-end: url(#arrow); }
+      .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .serif { font-family: Georgia, "Times New Roman", serif; }
+      .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 2px; fill: #57706f; }
+      .headline { font-size: 30px; font-weight: 500; fill: #172c35; }
+      .subtitle { font-size: 14px; fill: #586b70; }
+      .stage { font-size: 12px; font-weight: 750; letter-spacing: 1.1px; fill: #52666b; }
+      .card-title { font-size: 15px; font-weight: 700; fill: #182f38; }
+      .copy { font-size: 12px; fill: #607176; }
+      .micro { font-size: 10px; font-weight: 700; letter-spacing: 1px; fill: #74858a; }
+      .panel-title { font-size: 12px; font-weight: 750; letter-spacing: 1.5px; fill: #53666b; }
+      .panel-copy { font-size: 12px; fill: #52666b; }
+      .card { fill: #fffefa; stroke: #d9ddd8; stroke-width: 1.2; }
+      .wire { fill: none; stroke: #87969a; stroke-width: 1.7; marker-end: url(#arrow); }
+      .wire-teal { fill: none; stroke: #16877d; stroke-width: 1.8; marker-end: url(#arrow-teal); }
+      .wire-amber { fill: none; stroke: #b56b18; stroke-width: 1.7; stroke-dasharray: 5 5; marker-end: url(#arrow-amber); }
+      .flowline { fill: none; stroke: #16877d; stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 1 13; animation: flow 2.8s linear infinite; }
+      .flowline-amber { fill: none; stroke: #d28b37; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1 12; animation: flow 3.4s linear infinite; }
+      @keyframes flow { to { stroke-dashoffset: -56; } }
+      @media (prefers-reduced-motion: reduce) {
+        .flowline, .flowline-amber { animation: none; }
+      }
     </style>
   </defs>
 
-  <rect width="1440" height="720" rx="28" fill="url(#bg)"/>
-  <rect width="1440" height="720" rx="28" fill="url(#dots)" opacity="0.72"/>
+  <rect width="1440" height="1000" fill="#f7f7f2"/>
+  <rect width="1440" height="1000" fill="url(#paper-grid)" opacity="0.44"/>
 
-  <text x="54" y="58" class="mono eyebrow">ULTRASPLITTER / AGENT-NATIVE PIPELINE</text>
-  <text x="54" y="94" class="mono title">generated sheet → usable, traceable assets</text>
-  <text x="1386" y="59" text-anchor="end" class="mono box-copy">schema v3 · bounded repair</text>
+  <text x="56" y="48" class="sans eyebrow">ULTRASPLITTER / PROCESSING MODEL</text>
+  <text x="56" y="91" class="serif headline">From mixed sheet to traceable delivery</text>
+  <text x="56" y="121" class="sans subtitle">Semantic scope by a multimodal host · source pixels by deterministic tools · reconstruction only with approval</text>
+  <path d="M56 145H1384" stroke="#d7dcd7" stroke-width="1"/>
+  <text x="1384" y="48" text-anchor="end" class="sans micro">SYSTEMS VIEW / 01</text>
 
-  <!-- Main pipeline -->
-  <g filter="url(#shadow)">
-    <rect x="54" y="142" width="228" height="128" rx="18" fill="#162238" stroke="#31435f" stroke-width="2"/>
-    <text x="76" y="176" class="mono box-title">┌ INPUT</text>
-    <text x="76" y="208" class="mono box-copy">│ AIGC asset sheet</text>
-    <text x="76" y="232" class="mono box-copy">└ mixed subjects.png</text>
+  <!-- Primary pipeline -->
+  <g class="sans">
+    <rect x="56" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="282" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="508" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="734" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="960" y="180" width="198" height="250" rx="8" class="card"/>
+    <rect x="1186" y="180" width="198" height="250" rx="8" class="card"/>
 
-    <rect x="340" y="142" width="228" height="128" rx="18" fill="#162238" stroke="#31435f" stroke-width="2"/>
-    <text x="362" y="176" class="mono box-title">01 / SCAN</text>
-    <text x="362" y="208" class="mono box-copy">pixels → regions</text>
-    <text x="362" y="232" class="mono box-copy">exact source coords</text>
+    <!-- 00 / source sheet -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="99,260 153,229 207,260 153,291" fill="#f5ead5" stroke="#c9b995"/>
+      <polygon points="99,260 153,291 153,303 99,272" fill="#e7d8b8" stroke="#c9b995"/>
+      <polygon points="153,291 207,260 207,272 153,303" fill="#d8c8a4" stroke="#c9b995"/>
+      <polygon points="117,259 141,245 164,258 140,272" fill="#d0e5de" stroke="#7faaa0"/>
+      <polygon points="143,275 163,264 182,275 162,287" fill="#ead6bf" stroke="#c6a879"/>
+      <polygon points="158,250 177,239 191,247 172,259" fill="#cfdae8" stroke="#91a3b8"/>
+    </g>
+    <text x="76" y="329" class="stage">00 / INPUT</text>
+    <text x="76" y="354" class="card-title">Irregular asset sheet</text>
+    <text x="76" y="379" class="copy">mixed scale · uneven spacing</text>
+    <text x="76" y="399" class="copy">source pixels stay authoritative</text>
 
-    <rect x="626" y="142" width="250" height="128" rx="18" fill="#162238" stroke="#3f5272" stroke-width="2"/>
-    <text x="648" y="176" class="mono box-title">02 / REFLECT + PLAN</text>
-    <text x="648" y="208" class="mono box-copy">inventory subjects;</text>
-    <text x="648" y="232" class="mono box-copy">align ambiguous scope</text>
+    <!-- 01 / deterministic scan -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="327,259 380,229 433,259 380,289" fill="#e7eff0" stroke="#9eb2b4"/>
+      <polygon points="327,259 380,289 380,301 327,271" fill="#d2e0e0" stroke="#9eb2b4"/>
+      <polygon points="380,289 433,259 433,271 380,301" fill="#c1d2d3" stroke="#9eb2b4"/>
+      <path d="M347 259L380 240L413 259M347 259L380 278L413 259M365 249V269M380 240V278M397 249V269" fill="none" stroke="#678b8d"/>
+      <path d="M353 252L407 266" stroke="#16877d" stroke-width="2"/>
+    </g>
+    <text x="302" y="329" class="stage">01 / SCAN</text>
+    <text x="302" y="354" class="card-title">Deterministic regions</text>
+    <text x="302" y="379" class="copy">panels or simple backgrounds</text>
+    <text x="302" y="399" class="copy">exact oriented-source coordinates</text>
 
-    <rect x="934" y="142" width="210" height="128" rx="18" fill="#162238" stroke="#3f5272" stroke-width="2"/>
-    <text x="956" y="176" class="mono box-title">03 / APPLY + ROUTE</text>
-    <text x="956" y="208" class="mono box-copy">exact candidate IDs;</text>
-    <text x="956" y="232" class="mono box-copy">repair only if needed</text>
+    <!-- 02 / host semantic plan -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="555,260 606,231 657,260 606,289" fill="#eae6f2" stroke="#a99cbd"/>
+      <polygon points="555,260 606,289 606,301 555,272" fill="#d8d0e5" stroke="#a99cbd"/>
+      <polygon points="606,289 657,260 657,272 606,301" fill="#c6bdd9" stroke="#a99cbd"/>
+      <rect x="578" y="248" width="27" height="20" rx="2" fill="#fffefa" stroke="#8c7ba7"/>
+      <rect x="611" y="248" width="27" height="20" rx="2" fill="#fffefa" stroke="#8c7ba7"/>
+      <path d="M583 254H599M583 260H596M616 254H632M616 260H629" stroke="#8c7ba7"/>
+      <circle cx="606" cy="276" r="4" fill="#b56b18"/>
+    </g>
+    <text x="528" y="329" class="stage">02 / PLAN</text>
+    <text x="528" y="354" class="card-title">Semantic inventory</text>
+    <text x="528" y="379" class="copy">host groups stable region IDs</text>
+    <text x="528" y="399" class="copy">clarify ambiguous scope with user</text>
 
-    <rect x="1202" y="142" width="184" height="128" rx="18" fill="#132c28" stroke="#38bfa3" stroke-width="2"/>
-    <text x="1224" y="176" class="mono box-title">04 / MAIN REVIEW</text>
-    <text x="1224" y="208" class="mono box-copy">preview + each asset</text>
-    <text x="1224" y="232" class="mono box-copy">pass → primary delivery</text>
+    <!-- 03 / apply and route -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="781,259 833,229 885,259 833,289" fill="#deeeea" stroke="#83aaa0"/>
+      <polygon points="781,259 833,289 833,301 781,271" fill="#c7dfd8" stroke="#83aaa0"/>
+      <polygon points="833,289 885,259 885,271 833,301" fill="#b2d2c9" stroke="#83aaa0"/>
+      <circle cx="833" cy="259" r="8" fill="#fffefa" stroke="#16877d" stroke-width="2"/>
+      <path d="M833 251V239M826 263L811 271M840 263L855 271" fill="none" stroke="#16877d" stroke-width="1.8"/>
+      <circle cx="833" cy="237" r="4" fill="#16877d"/>
+      <circle cx="808" cy="273" r="4" fill="#16877d"/>
+      <circle cx="858" cy="273" r="4" fill="#b56b18"/>
+    </g>
+    <text x="754" y="329" class="stage">03 / APPLY + ROUTE</text>
+    <text x="754" y="354" class="card-title">Source-preserving paths</text>
+    <text x="754" y="379" class="copy">crop · composite · approved repair</text>
+    <text x="754" y="399" class="copy">missing pixels require approval</text>
+
+    <!-- 04 / primary review -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="1005,261 1058,231 1111,261 1058,291" fill="#e4eceb" stroke="#93aaa6"/>
+      <polygon points="1005,261 1058,291 1058,302 1005,272" fill="#cfddda" stroke="#93aaa6"/>
+      <polygon points="1058,291 1111,261 1111,272 1058,302" fill="#bbcfca" stroke="#93aaa6"/>
+      <rect x="1032" y="248" width="48" height="27" rx="2" fill="#fffefa" stroke="#688581"/>
+      <path d="M1038 254H1055M1038 259H1055M1063 254L1068 259L1076 250" fill="none" stroke="#16877d" stroke-width="1.7"/>
+      <circle cx="1091" cy="252" r="4" fill="#16877d"/>
+    </g>
+    <text x="980" y="329" class="stage">04 / REVIEW</text>
+    <text x="980" y="354" class="card-title">Primary visual gate</text>
+    <text x="980" y="379" class="copy">compare inventory and every asset</text>
+    <text x="980" y="399" class="copy">only an explicit pass proceeds</text>
+
+    <!-- 05 / outputs -->
+    <g stroke-linejoin="round" stroke-width="1.2">
+      <polygon points="1230,259 1284,228 1338,259 1284,290" fill="#e4eee5" stroke="#97ad97"/>
+      <polygon points="1230,259 1284,290 1284,301 1230,270" fill="#d1e0d0" stroke="#97ad97"/>
+      <polygon points="1284,290 1338,259 1338,270 1284,301" fill="#bed2bd" stroke="#97ad97"/>
+      <path d="M1253 260L1270 250L1287 260L1270 270Z" fill="#fffefa" stroke="#78977b"/>
+      <path d="M1277 274L1294 264L1310 273L1293 283Z" fill="#fffefa" stroke="#78977b"/>
+      <path d="M1290 250L1307 240L1323 249L1306 259Z" fill="#fffefa" stroke="#78977b"/>
+    </g>
+    <text x="1202" y="329" class="stage">05 / DELIVER</text>
+    <text x="1202" y="354" class="card-title">Images + layered PSD</text>
+    <text x="1202" y="379" class="copy">numbered pages when canvas is full</text>
+    <text x="1202" y="399" class="copy">manifest records paths and provenance</text>
   </g>
 
-  <path d="M282 206 H340" class="wire"/>
-  <path d="M568 206 H626" class="wire"/>
-  <path d="M876 206 H934" class="wire"/>
-  <path d="M1294 142 V116 H751 V142" class="soft-wire"/>
-  <text x="1022" y="108" text-anchor="middle" class="mono box-copy" fill="#fbc56d">failed review → revise one named cause</text>
-
-  <!-- Route branches -->
-  <path d="M1039 270 V326 H1170" class="wire"/>
-  <path d="M1039 270 V404 H1170" class="wire"/>
-  <path d="M1039 270 V482 H1098" class="wire"/>
-
-  <g filter="url(#shadow)">
-    <rect x="1170" y="300" width="216" height="58" rx="14" fill="#12352d" stroke="#36d399"/>
-    <text x="1190" y="335" class="mono route" fill="#78efc0">├─ source_crop</text>
-    <rect x="1170" y="378" width="216" height="58" rx="14" fill="#123144" stroke="#38bdf8"/>
-    <text x="1190" y="413" class="mono route" fill="#7dd3fc">├─ source_composite</text>
-    <rect x="1098" y="456" width="288" height="58" rx="14" fill="#3a2915" stroke="#f59e0b"/>
-    <text x="1118" y="491" class="mono route" fill="#fbc56d">└─ generated_reconstruction</text>
+  <!-- Animated mainline: static arrows remain visible when motion is disabled. -->
+  <g>
+    <path d="M254 304H282M480 304H508M706 304H734M932 304H960M1158 304H1186" class="wire"/>
+    <path d="M254 304H282M480 304H508M706 304H734M932 304H960M1158 304H1186" class="flowline"/>
   </g>
 
-  <path d="M1278 300 V270" class="wire"/>
-  <path d="M1278 378 V270" class="wire"/>
-
-  <!-- Repair loop -->
-  <g filter="url(#shadow)">
-    <rect x="54" y="430" width="226" height="126" rx="18" fill="#201d32" stroke="#7665c8" stroke-width="2"/>
-    <text x="76" y="464" class="mono box-title">A / TRIAGE</text>
-    <text x="76" y="496" class="mono box-copy">deliver · repair</text>
-    <text x="76" y="520" class="mono box-copy">ignore · ask user</text>
-
-    <rect x="338" y="430" width="226" height="126" rx="18" fill="#322515" stroke="#d89838" stroke-width="2"/>
-    <text x="360" y="464" class="mono box-title">B / APPROVAL</text>
-    <text x="360" y="496" class="mono box-copy">show targets + cost</text>
-    <text x="360" y="520" class="mono box-copy">user authorizes once</text>
-
-    <rect x="622" y="430" width="226" height="126" rx="18" fill="#2d1d2f" stroke="#c55ac7" stroke-width="2"/>
-    <text x="644" y="464" class="mono box-title">C / AIGC GRID</text>
-    <text x="644" y="496" class="mono box-copy">one group · one grid</text>
-    <text x="644" y="520" class="mono box-copy">complete + normalize</text>
-
-    <rect x="906" y="570" width="238" height="94" rx="18" fill="#162238" stroke="#536a8e" stroke-width="2"/>
-    <text x="928" y="604" class="mono box-title">D / INGEST + SPLIT</text>
-    <text x="928" y="636" class="mono box-copy">validate grid → assets</text>
-
-    <rect x="622" y="570" width="226" height="94" rx="18" fill="#162238" stroke="#536a8e" stroke-width="2"/>
-    <text x="644" y="604" class="mono box-title">E / EVALUATE</text>
-    <text x="644" y="636" class="mono box-copy">pass / retry ≤ 2 / exit</text>
-
-    <rect x="1170" y="570" width="216" height="94" rx="18" fill="#132c28" stroke="#38bfa3" stroke-width="2"/>
-    <text x="1192" y="604" class="mono box-title">T / ALPHA QA</text>
-    <text x="1192" y="632" class="mono box-copy">white · black · checker</text>
-    <text x="1192" y="652" class="mono box-copy">pass → optional variant</text>
+  <!-- Approval-gated repair branch -->
+  <rect x="56" y="492" width="820" height="264" rx="8" fill="#fbf8f1" stroke="#e2d6c2" stroke-width="1.2"/>
+  <text x="80" y="526" class="sans panel-title">CONDITIONAL REPAIR / ONLY FOR APPROVED, IDENTITY-GROUNDED SUBJECTS</text>
+  <text x="80" y="548" class="sans copy">Reconstruction is inferred content; it returns to the same primary review gate.</text>
+  <g class="sans">
+    <rect x="80" y="579" width="220" height="132" rx="5" fill="#fffefa" stroke="#d9c7a8"/>
+    <rect x="342" y="579" width="220" height="132" rx="5" fill="#fffefa" stroke="#d9c7a8"/>
+    <rect x="604" y="579" width="220" height="132" rx="5" fill="#fffefa" stroke="#d9c7a8"/>
+    <text x="98" y="606" class="micro" fill="#9a651e">A / APPROVAL</text>
+    <text x="98" y="635" class="card-title">Show scope + cost</text>
+    <text x="98" y="660" class="panel-copy">User approves the exact</text>
+    <text x="98" y="678" class="panel-copy">repair group before generation.</text>
+    <text x="360" y="606" class="micro" fill="#9a651e">B / GENERATE</text>
+    <text x="360" y="635" class="card-title">One constrained grid</text>
+    <text x="360" y="660" class="panel-copy">One regular grid per conflict</text>
+    <text x="360" y="678" class="panel-copy">group; generated pixels labeled.</text>
+    <text x="622" y="606" class="micro" fill="#9a651e">C / INGEST</text>
+    <text x="622" y="635" class="card-title">Validate + re-split</text>
+    <text x="622" y="660" class="panel-copy">Deterministic checks, then</text>
+    <text x="622" y="678" class="panel-copy">return to primary review.</text>
   </g>
+  <path d="M300 646H342M562 646H604" class="wire-amber"/>
+  <path d="M300 646H342M562 646H604" class="flowline-amber"/>
+  <path d="M833 430V466H470V579" class="wire-amber"/>
+  <path d="M833 430V466H470V579" class="flowline-amber"/>
+  <text x="525" y="461" class="sans micro" fill="#9a651e">INCOMPLETE / CLIPPED</text>
+  <path d="M824 646H910V452H1059V430" class="wire-teal"/>
+  <path d="M824 646H910V452H1059V430" class="flowline"/>
 
-  <path d="M626 270 V340 H167 V430" class="soft-wire"/>
-  <path d="M280 493 H338" class="wire"/>
-  <path d="M564 493 H622" class="wire"/>
-  <path d="M848 493 H1025 V570" class="wire"/>
-  <path d="M906 617 H848" class="wire"/>
-  <path d="M622 648 H590 V493 H622" class="soft-wire"/>
-  <text x="338" y="618" class="mono box-copy" fill="#fbc56d">retry only the failed constraint</text>
-  <path d="M735 664 V674 H1294 V270" class="wire"/>
-  <text x="1030" y="668" text-anchor="middle" class="mono box-copy" fill="#78efc0">visual pass</text>
-  <path d="M1386 206 H1404 V617 H1386" class="soft-wire"/>
+  <!-- Optional alpha review after primary review -->
+  <rect x="932" y="492" width="452" height="264" rx="8" fill="#f3f5f1" stroke="#d2dcd5" stroke-width="1.2"/>
+  <text x="956" y="526" class="sans panel-title">OPTIONAL TRANSPARENT VARIANT REVIEW</text>
+  <text x="956" y="548" class="sans copy">Separate gate after primary assets pass.</text>
+  <path d="M1059 430V492" class="wire"/>
+  <text x="1074" y="468" class="sans micro">OPTIONAL</text>
+  <g class="sans">
+    <rect x="958" y="579" width="112" height="82" rx="4" fill="#fff" stroke="#cbd3ce"/>
+    <rect x="1102" y="579" width="112" height="82" rx="4" fill="#171b1c" stroke="#444d4c"/>
+    <rect x="1246" y="579" width="112" height="82" rx="4" fill="url(#checker)" stroke="#cbd3ce"/>
+    <path d="M990 633L1013 601L1038 633Z" fill="#d9a15b" stroke="#ad7c41"/>
+    <path d="M1134 633L1157 601L1182 633Z" fill="#d9a15b" stroke="#ad7c41"/>
+    <path d="M1278 633L1301 601L1326 633Z" fill="#d9a15b" stroke="#ad7c41"/>
+    <text x="1014" y="682" text-anchor="middle" class="micro">WHITE</text>
+    <text x="1158" y="682" text-anchor="middle" class="micro">BLACK</text>
+    <text x="1302" y="682" text-anchor="middle" class="micro">CHECKER</text>
+    <text x="956" y="724" class="sans copy">Transparent PNGs are promoted only after their own visual pass.</text>
+  </g>
+  <path d="M1384 624H1406V454H1285V430" class="wire"/>
 
-  <text x="54" y="687" class="mono box-copy">primary assets stay independent  ·  transparent variants require their own pass  ·  generated pixels stay labeled</text>
+  <!-- Delivery contract -->
+  <path d="M56 800H1384" stroke="#d7dcd7" stroke-width="1"/>
+  <text x="56" y="832" class="sans panel-title">DELIVERY CONTRACT</text>
+  <text x="56" y="860" class="sans card-title">Named images + layered PSD page set</text>
+  <text x="56" y="883" class="sans copy">PSD export follows primary visual approval.</text>
+  <path d="M486 824V890" stroke="#d7dcd7"/>
+  <text x="520" y="832" class="sans panel-title">CANVAS LIMIT</text>
+  <text x="520" y="860" class="sans card-title">30,000 px per side</text>
+  <text x="520" y="883" class="sans copy">Overflow uses more PSD pages; oversized sources use native-pixel tiles.</text>
+  <path d="M1010 824V890" stroke="#d7dcd7"/>
+  <text x="1044" y="832" class="sans panel-title">PROVENANCE</text>
+  <text x="1044" y="860" class="sans card-title">Paths, routes + review state</text>
+  <text x="1044" y="883" class="sans copy">Recorded in the schema-v3 manifest.</text>
+  <text x="56" y="954" class="sans micro">SOURCE PIXELS</text>
+  <circle cx="168" cy="950" r="4" fill="#16877d"/>
+  <text x="184" y="954" class="sans micro">APPROVAL-GATED RECONSTRUCTION</text>
+  <circle cx="399" cy="950" r="4" fill="#b56b18"/>
+  <text x="415" y="954" class="sans micro">OPTIONAL ALPHA REVIEW</text>
+  <circle cx="585" cy="950" r="4" fill="#8b79a9"/>
 </svg>

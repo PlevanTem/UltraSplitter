@@ -8,7 +8,9 @@
 
 <sub>直观流程插画 · <a href="docs/assets/banner-static.png">查看静态版</a></sub>
 
-**把 AIGC 生成的整张方案图，变成生产流程真正能用的独立资产。**
+**把不规则素材图拆成可审核、可追溯的独立资产。**
+
+AI 识别主体，代码按原图像素拆分，输出图片与分层 PSD。
 
 图片模型很擅长在一张图里展示一组创意：UI 图标、武器合集、角色多视图、建筑立面、家具方案、产品变体。整图看起来已经完成，但里面的素材仍被锁在一个位图文件中。间距不均、尺寸混杂、文字边框、轮廓相接和主体截断，都会让均匀切图失效。
 
@@ -127,7 +129,7 @@ ultrasplit evaluate output/task/manifest.json --visual-verdict pass
 
 ## 架构
 
-<img src="docs/assets/architecture.svg" alt="UltraSplitter AI 原生处理架构" width="100%">
+<img src="docs/assets/architecture.svg" alt="不规则素材图经过扫描、语义规划、原像素路由和主视觉审核后，交付图片与分层 PSD；另含可选的透明版本审阅和重建路径" width="100%">
 
 每次运行都会写入 schema v3 的 `manifest.json`，记录准确的源图坐标、路由依据、来源追踪、批准状态、有界修复次数、评估结果和绝对访问路径。完整设计见 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
